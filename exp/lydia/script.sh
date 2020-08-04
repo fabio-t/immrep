@@ -2,6 +2,7 @@
 
 migec="migec"
 safe="_safe"
+R="R12"
 
 # indices=`echo {1..11} {13..17} {19..21}`
 # exp_dir="170714_cultures"
@@ -80,22 +81,6 @@ exp_dir="200615_diversity_2"
 exp_data_dir="200615_diversity"
 migec="migec2"
 
-mkdir -p $exp_dir && cd $exp_dir
+# load and run script
+source ../../code/script.sh
 
-R=R12
-# R=R1
-
-mkdir -p stats collisions
-for i in $indices
-do
-    cat ../../../local/mol_med/tcr_cd3/${exp_data_dir}/samples/${migec}/${R}/cdrfinal_${i}${safe}/S0_R12.csv | awk -F"\t" '{print $1"\t"$3"\t"$4"\t"$5"\t"$6"\t"$2}' > mid${i}_clones.csv
-    cat mid${i}_clones.csv |  awk '{print $2}' | uniq -c | awk '{if($1 > 1){print $0}}' | sort -k1,1 -r > collisions/mid${i}_collision.csv
-    cp ../../../local/mol_med/tcr_cd3/${exp_data_dir}/samples/${migec}/${R}/*.csv stats/
-    cp ../../../local/mol_med/tcr_cd3/${exp_data_dir}/samples/r{1,2}_stats.csv stats/
-done
-
-../../../code/join_mids.py --unique --type gene $indices
-
-Rscript ../../../code/family_usage_full.R
-
-Rscript ../code/${exp_dir}.R
