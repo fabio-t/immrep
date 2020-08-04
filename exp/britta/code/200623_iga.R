@@ -10,7 +10,7 @@ mids_counts = read.csv("mids_counts.csv", sep="\t", row.names = 1)
 
 mid_names = colnames(mids_counts) # should be substituted with proper labels, but were not provided
 
-make_rarefaction_plots(mids_counts, rarefy=T)
+# make_rarefaction_plots(mids_counts, rarefy=T)
 
 ## diversity
 
@@ -23,4 +23,5 @@ heatmaps(NULL, NULL, cex = 0.5)
 ## radarcharts
 
 for (tp in c(1, 0.85)) {
+    radarcharts("MID[234]$", "mid2-3-4", save = T)
 }

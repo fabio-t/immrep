@@ -10,7 +10,7 @@ mids_counts = read.csv("mids_counts.csv", sep="\t", row.names = 1)
 
 mid_names = colnames(mids_counts) # should be substituted with proper labels, but were not provided
 
-make_rarefaction_plots(mids_counts, rarefy=T)
+# make_rarefaction_plots(mids_counts, rarefy=T)
 
 ## diversity
 
