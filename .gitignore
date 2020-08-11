@@ -1,3 +1,17 @@
+# data
+local/
+
+exp/
+!exp/*/code
+!exp/*/script*.sh
+!exp/*/*/code
+!exp/*/*/script*.sh
+
+# Sciebo
+.sync*
+.owncloud*
+._sync*
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]

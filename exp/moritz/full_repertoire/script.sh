@@ -1,5 +1,7 @@
 #!/bin/bash
 
+# FIXME: to modify, see lydia's
+
 indices=`echo {42..56}`
 exp_dir="170126_vancomycin"
 exp_data_dir="170126_vancomycin"
