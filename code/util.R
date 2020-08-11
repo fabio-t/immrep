@@ -19,26 +19,27 @@ install_github("fabio-t/mixed.utils")
 # install("/home/fabio/Research/mixed.utils")
 library(mixed.utils)
 
-heatmaps <- function(regexp, dirname, cex = 0.9) {
+heatmaps <- function(regexp, prefix=NULL, invert = F, cex = 0.9) {
     if (is.null(regexp)) {
         ## All
         make_full_heatmap(mids_counts, "horn",      mid_names, prefix="full", binary=F, types="square", cexRow=cex, cexCol=cex, tsne=T)
         make_full_heatmap(mids_counts, "intersect", mid_names, prefix="full", types="square", vlim=c(0, NA), cexRow=cex, cexCol=cex)
         make_full_heatmap(mids_counts, "intersect", mid_names, prefix="full_top0.85", topPerc=0.85, types="square", vlim=c(0, NA), cexRow=cex, cexCol=cex)
     } else {
-        columns_i = grep(regexp, mid_names)
+        # prefix is expected to be set, now
+        columns_i = grep(regexp, mid_names, perl=T, invert = invert)
         columns_n = mid_names[columns_i]
         data = mids_counts[columns_i]
-        make_full_heatmap(data, "horn",      columns_n, prefix=dirname, binary=F, types="square", cexRow=cex, cexCol=cex, tsne=T)
-        make_full_heatmap(data, "intersect", columns_n, prefix=dirname, types="square", vlim=c(0, NA), cexRow=cex, cexCol=cex)
-        make_full_heatmap(data, "intersect", columns_n, prefix=paste0(dirname, "_top0.85"), topPerc=0.85, types="square", vlim=c(0, NA), cexRow=cex, cexCol=cex)
+        make_full_heatmap(data, "horn",      columns_n, prefix=prefix, binary=F, types="square", cexRow=cex, cexCol=cex, tsne=T)
+        make_full_heatmap(data, "intersect", columns_n, prefix=prefix, types="square", vlim=c(0, NA), cexRow=cex, cexCol=cex)
+        make_full_heatmap(data, "intersect", columns_n, prefix=paste0(prefix, "_top0.85"), topPerc=0.85, types="square", vlim=c(0, NA), cexRow=cex, cexCol=cex)
     }
 }
 
-radarcharts <- function(regexp, dirname, save = F) {
+radarcharts <- function(regexp, dirname, save = F, invert = F) {
     print(dirname)
 
-    column_indices = grep(regexp, mid_names)
+    column_indices = grep(regexp, mid_names, perl = T, invert = invert)
 
     column_names   = colnames(mids_counts)[column_indices]
     column_names_2 = mid_names[column_indices]
@@ -289,13 +290,17 @@ get_present_clones <- function(column) {
     return(rownames(column))
 }
 
-get_top_clones <- function(data, topN = NULL, topPerc = NULL) {
+get_top_clones <- function(data, topN = NULL, topPerc = NULL, min_clones = 3, exclude = NULL) {
+    columns <- setdiff(colnames(data), exclude)
+
     if (!is.null(topN)) {
         rows <- c()
 
+        topN <- max(topN, min_clones)
+
         # for each column, take the topN clones (non-null rows)
         # and merge them together.
-        for (column in colnames(data))
+        for (column in columns)
         {
             df <- data[column]
             df <- subset(df, df > 0)
@@ -310,23 +315,25 @@ get_top_clones <- function(data, topN = NULL, topPerc = NULL) {
 
         # for each column, take the topPerc clones (non-null rows)
         # and merge them together.
-        for (column in colnames(data))
+        for (column in columns)
         {
-            print(column)
             df <- data[column]
             df <- subset(df, df > 0)
             df <- df[order(df[, c(1)], decreasing = T), c(1), drop = F]
             abundance <- sum(df) * topPerc
-            df <- df[cumsum(df) <= abundance, , drop = F]
+            df_rows <- rownames(df)[cumsum(df) <= abundance]
+
+            # we force a minimum number of clones
+            n_clones <- max(length(df_rows), min_clones)
+            df_rows <- rownames(df)[1:n_clones]
 
             # fix for issue identified on 29/05/2017:
-            # if we take the union, some of the clones left out will
-            # essentially "come back" for each organ.
-            data[setdiff(rownames(data), rownames(df)), column] <- 0
+            # when we take the union (couple of lines below),
+            # some of the clones left out will "come back" for each organ (but they are NOT among the top for that organ!).
+            # so we set them to zero column by column, to make sure that the non-selected clones completely disappear.
+            data[setdiff(rownames(data), df_rows), column] <- 0
 
-            # print(length(rownames(df)))
-
-            rows <- union(rows, rownames(df))
+            rows <- union(rows, df_rows)
         }
     }
     else {

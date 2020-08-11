@@ -60,7 +60,7 @@ mid_names = c(
               "25_FoxP3-_80K_m2"
           )
 
-#make_rarefaction_plots(mids_counts, rarefy=T)
+make_rarefaction_plots(mids_counts, rarefy=T)
 
 ## diversity
 
@@ -82,30 +82,30 @@ heatmaps("_80K_",   "80K_m1-2")
 ## radarcharts
 
 for (tp in c(1, 0.85)) {
-    # radarcharts("FoxP3\\+_.*_m1$", "foxp3+_m1", save = T)
-    # radarcharts("FoxP3-_.*_m1$", "foxp3-_m1", save = T)
-    # radarcharts("FoxP3\\+_.*_m2$", "foxp3+_m2", save = T)
-    # radarcharts("FoxP3-_.*_m2$", "foxp3-_m2", save = T)
-    # 
-    # radarcharts("FoxP3\\+_10K_m1$", "foxp3+_m1_10K", save = T)
-    # radarcharts("FoxP3\\+_30K_m1$", "foxp3+_m1_30K", save = T)
-    # radarcharts("FoxP3\\+_80K_m1$", "foxp3+_m1_80K", save = T)
-    # 
-    # radarcharts("FoxP3-_10K_m1$", "foxp3-_m1_10K", save = T)
-    # radarcharts("FoxP3-_80K_m1$", "foxp3-_m1_80K", save = T)
-    # 
-    # radarcharts("FoxP3\\+_10K_m2$", "foxp3+_m2_10K", save = T)
-    # radarcharts("FoxP3\\+_30K_m2$", "foxp3+_m2_30K", save = T)
-    # radarcharts("FoxP3\\+_80K_m2$", "foxp3+_m2_80K", save = T)
-    # 
-    # radarcharts("FoxP3-_10K_m2$", "foxp3-_m2_10K", save = T)
-    # radarcharts("FoxP3-_80K_m2$", "foxp3-_m2_80K", save = T)
+    radarcharts("FoxP3\\+_.*_m1$", "foxp3+_m1", save = T)
+    radarcharts("FoxP3-_.*_m1$", "foxp3-_m1", save = T)
+    radarcharts("FoxP3\\+_.*_m2$", "foxp3+_m2", save = T)
+    radarcharts("FoxP3-_.*_m2$", "foxp3-_m2", save = T)
+    
+    radarcharts("FoxP3\\+_10K_m1$", "foxp3+_m1_10K", save = T)
+    radarcharts("FoxP3\\+_30K_m1$", "foxp3+_m1_30K", save = T)
+    radarcharts("FoxP3\\+_80K_m1$", "foxp3+_m1_80K", save = T)
+    
+    radarcharts("FoxP3-_10K_m1$", "foxp3-_m1_10K", save = T)
+    radarcharts("FoxP3-_80K_m1$", "foxp3-_m1_80K", save = T)
+    
+    radarcharts("FoxP3\\+_10K_m2$", "foxp3+_m2_10K", save = T)
+    radarcharts("FoxP3\\+_30K_m2$", "foxp3+_m2_30K", save = T)
+    radarcharts("FoxP3\\+_80K_m2$", "foxp3+_m2_80K", save = T)
+    
+    radarcharts("FoxP3-_10K_m2$", "foxp3-_m2_10K", save = T)
+    radarcharts("FoxP3-_80K_m2$", "foxp3-_m2_80K", save = T)
 
-    # radarcharts("_10K_m1", "m1_10K", save = T)
-    # radarcharts("_80K_m1", "m1_80K", save = T)
+    radarcharts("_10K_m1", "m1_10K", save = T)
+    radarcharts("_80K_m1", "m1_80K", save = T)
 
-    # radarcharts("_10K_m2", "m2_10K", save = T)
-    # radarcharts("_80K_m2", "m2_80K", save = T)
+    radarcharts("_10K_m2", "m2_10K", save = T)
+    radarcharts("_80K_m2", "m2_80K", save = T)
 
     radarcharts("FoxP3\\+_80K_", "foxp3+_80K", save = T)
     radarcharts("FoxP3-_80K_",   "foxp3-_80K", save = T)
