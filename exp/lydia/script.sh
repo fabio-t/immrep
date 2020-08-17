@@ -70,9 +70,9 @@ R="R12"
 # exp_dir="200415_resident"
 # exp_data_dir="200415_resident"
 
-indices=`echo {1..11} {13..17} {19..47}`
-exp_dir="200615_diversity"
-exp_data_dir="200615_diversity"
+# indices=`echo {1..11} {13..17} {19..47}`
+# exp_dir="200615_diversity"
+# exp_data_dir="200615_diversity"
 
 ## "strict" version, it requires a change in the $safe and $migec variables
 # indices=`echo {35..44}`
@@ -82,10 +82,10 @@ exp_data_dir="200615_diversity"
 # safe="_safe_long_2"
 
 ## removed chimeric and pseudogenes
-# indices=`echo {1..11} {13..17} {19..47}`
-# exp_dir="200615_diversity_2"
-# exp_data_dir="200615_diversity"
-# migec="migec2"
+indices=`echo {1..11} {13..17} {19..47}`
+exp_dir="200615_diversity_2"
+exp_data_dir="200615_diversity"
+migec="migec2"
 
 # load and run script
 source ../../code/script.sh
