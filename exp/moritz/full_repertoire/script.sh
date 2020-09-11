@@ -1,10 +1,13 @@
 #!/bin/bash
 
-# FIXME: to modify, see lydia's
+migec="migec"
+data_type="tcr"
+safe="_safe"
+R="R12"
 
-indices=`echo {42..56}`
-exp_dir="170126_vancomycin"
-exp_data_dir="170126_vancomycin"
+# indices=`echo {42..56}`
+# exp_dir="170126_vancomycin"
+# exp_data_dir="170126_vancomycin"
 
 # indices=`echo {1..11} {13..16}`
 # exp_dir="170707_diet"
@@ -30,22 +33,9 @@ exp_data_dir="170126_vancomycin"
 # exp_dir="171024_capture"
 # exp_data_dir="171024_capture"
 
-mkdir -p $exp_dir && cd $exp_dir
+## FIXME: originally there was this, but inside the script (for more recent
+## experiments) we also add --type gene. To evaluate why not for Moritz
+# ../../../../code/join_mids.py --unique $indices
 
-R=R12
-# R=R1
-
-safe="_safe"
-# safe=""
-
-for i in $indices
-do
-   cat ../../../../local/mol_med/tcr_cd3/${exp_data_dir}/samples/migec/${R}/cdrfinal_${i}${safe}/S0_R12.csv | awk -F"\t" '{print $1"\t"$3"\t"$4"\t"$5"\t"$6"\t"$2}' > mid${i}_clones.csv
-done
-
-# ../../../../code/join_mids.py $indices
-../../../../code/join_mids.py --unique $indices
-
-Rscript ../../../../code/family_usage_full.R
-
-Rscript ../code/script_${exp_dir}.R
+# load and run script
+source ../../../code/script.sh

@@ -2,6 +2,8 @@
 library(xlsx)
 library(circlize)
 
+## TODO join with the full-repertoire script, making "full" an option
+
 cols <- c(
   "dodgerblue2", "#E31A1C", # red
   "green4",

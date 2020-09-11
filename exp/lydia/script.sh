@@ -1,6 +1,7 @@
 #!/bin/bash
 
 migec="migec"
+data_type="tcr"
 safe="_safe"
 R="R12"
 
@@ -89,4 +90,3 @@ migec="migec2"
 
 # load and run script
 source ../../code/script.sh
-

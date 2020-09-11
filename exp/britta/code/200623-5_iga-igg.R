@@ -26,12 +26,10 @@ heatmaps(NULL, NULL, cex = 0.5)
 ## radarcharts
 
 for (tp in c(1, 0.85)) {
-    # radarcharts("ID5_", "ID5",  save=T)
-    # radarcharts("ID10", "ID10", save=T)
-    # radarcharts("ID24", "ID24", save=T)
-    # radarcharts("ID29", "ID29", save=T)
-    # radarcharts("ID58", "ID58", save=T)
-    # radarcharts("ID59", "ID59", save=T)
+    radarcharts("IgA_ID", "IgA_ID",  save=T)
+    radarcharts("IgA_SI", "IgA_SI",  save=T)
+    radarcharts("IgG_ID", "IgG_ID",  save=T)
+    radarcharts("IgG_SI", "IgG_SI",  save=T)
 }
 
 library(treemap)
@@ -39,19 +37,18 @@ dirname = make_path("treemaps")
 for (column in colnames(mids_counts)) {
     mid_df <- cbind(clones=rownames(mids_counts), mids_counts[column])
     mid_df$freq <- mid_df[,column] / sum(mid_df[,column])
-    
+
     print(head(mid_df))
 
-    mid_df2 <- get_top_clones(mid_df, topN=10, exclude=c("clones", column)) 
+    mid_df2 <- get_top_clones(mid_df, topN=10, exclude=c("clones", column))
     print(head(mid_df2))
     svg(paste0(dirname, column, "_top10.svg"))
     treemap(mid_df2, index="clones", vSize="freq")
     dev.off()
 
-    mid_df2 <- get_top_clones(mid_df, topPerc=0.15, exclude=c("clones", column)) 
+    mid_df2 <- get_top_clones(mid_df, topPerc=0.15, exclude=c("clones", column))
     print(head(mid_df2))
     svg(paste0(dirname, column, "_top15perc.svg"))
     treemap(mid_df2, index="clones", vSize="freq")
     dev.off()
 }
-
