@@ -17,7 +17,7 @@ mid_names = c("Pool_1.1_a", "Pool_1.2_a", "Pool_1.3_a",
               "Pool_5.1_b", "Pool_5.2_b", "Pool_5.3_b")
 
 # rarefaction
-# make_rarefaction_plots(mids_counts, rarefy=T)
+make_rarefaction_plots(mids_counts, rarefy=T)
 
 # full heatmap
 make_full_heatmap(mids_counts, "horn",      mid_names, prefix="full", binary=F, types="square", cexRow=0.9, cexCol=0.9, tsne=T)

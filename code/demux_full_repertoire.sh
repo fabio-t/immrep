@@ -49,9 +49,8 @@ do
         nocache migec CdrBlast --log-file R12/cdrblast_${i}${safe}/log_raw.txt --log-overwrite --unmapped-fastq-file R12/cdrblast_${i}${safe}/unmpapped_raw.fastq --cdr3-fastq-file R12/cdrblast_${i}${safe}/cdr3_raw.fastq -q 15 -p $p --all-alleles $segments $chimeric -R $chain -S $organism R12/checkout_${i}${safe}/S0_R1.fastq R12/checkout_${i}${safe}/S0_R2.fastq R12/cdrblast_${i}${safe}/S0_R12_raw.txt
         nocache migec CdrBlast --log-file R12/cdrblast_${i}${safe}/log_asm.txt --log-overwrite --unmapped-fastq-file R12/cdrblast_${i}${safe}/unmpapped_asm.fastq --cdr3-fastq-file R12/cdrblast_${i}${safe}/cdr3_asm.fastq -a --cdr3-umi-table R12/cdrblast_${i}${safe}/umitable.csv -q 15 -p $p --all-alleles $segments $chimeric -R $chain -S $organism R12/assembly_${i}${safe}/S0_R1.t${m}.fastq R12/assembly_${i}${safe}/S0_R2.t${m}.fastq R12/cdrblast_${i}${safe}/S0_R12_asm.txt
         nocache migec FilterCdrBlastResults -p $p -n R12/cdrblast_${i}${safe}/S0_R12_asm.txt R12/cdrblast_${i}${safe}/S0_R12_raw.txt R12/cdrfinal_${i}${safe}/S0_R12.csv
-    
+
         echo -e "$i\t`tail -n+2 R12/cdrblast_${i}${safe}/umitable.csv | wc -l`\t`tail -n+2 R12/cdrfinal_${i}${safe}/S0_R12.csv | wc -l`\t`cat R12/cdrfinal_${i}${safe}/S0_R12.csv | awk 'NR>1{s+=$1}END{print s}'`\t`cat R12/histogram_${i}${safe}/estimates.txt | awk 'NR>1{print $3"\t"$4}'`" >> R12/summary.csv
-    
+
     done
 done
-

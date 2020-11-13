@@ -83,10 +83,58 @@ R="R12"
 # safe="_safe_long_2"
 
 ## removed chimeric and pseudogenes
-indices=`echo {1..11} {13..17} {19..47}`
-exp_dir="200615_diversity_2"
-exp_data_dir="200615_diversity"
+# indices=`echo {1..11} {13..17} {19..47}`
+# exp_dir="200615_diversity_2"
+# exp_data_dir="200615_diversity"
+# migec="migec2"
+
+## removed chimeric and pseudogenes
+# indices=`echo {1..11} {13..17} {19..30}`
+# exp_dir="200610_sc_seq"
+# exp_data_dir="200610_sc_seq"
+# migec="migec2"
+
+## removed chimeric and pseudogenes
+# indices=`echo {35..44}`
+# exp_dir="180830_sort_2"
+# exp_data_dir="190715_treg"
+# migec="migec2"
+
+## removed chimeric and pseudogenes
+# indices=`echo {20..55}`
+# exp_dir="190220_treg_2"
+# exp_data_dir="191104_mixed"
+# migec="migec2"
+
+## removed chimeric and pseudogenes
+# indices=`echo {27..38}`
+# exp_dir="191213_itregtcon2_2"
+# exp_data_dir="191213_mixed"
+# migec="migec2"
+
+## removed chimeric and pseudogenes
+# indices=`echo {39..47}`
+# exp_dir="190930_treg_2"
+# exp_data_dir="191213_mixed"
+# migec="migec2"
+
+## removed chimeric and pseudogenes
+indices=`echo {1..11} {13..17} {19..32}`
+exp_dir="171215_cultures_2"
+exp_data_dir="171215_cultures"
 migec="migec2"
+
+## removed chimeric and pseudogenes
+# indices=`echo {33..62}`
+# exp_dir="171215_cultures_TRB_2"
+# exp_data_dir="171215_cultures"
+# migec="migec2"
+
+## removed chimeric and pseudogenes
+# indices=`echo {1..11} {13..17} {19..22}`
+# exp_dir="200908_itregtc_2"
+# exp_data_dir="200908_itregtc"
+# migec="migec2"
 
 # load and run script
 source ../../code/script.sh
