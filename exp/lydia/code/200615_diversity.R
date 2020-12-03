@@ -43,7 +43,7 @@ mid_names = c(
               "7_FoxP3+_30K_m2",
               "8_FoxP3+_30K_m2",
               "9_FoxP3+_30K_m2",
-              "10_FoxP3+_30K_m2",
+              "10_FoxP3+_80K_m2",
               "11_FoxP3+_80K_m2",
               "12_FoxP3+_80K_m2",
 

@@ -53,7 +53,7 @@ mid_names = c("input_r1",
               "GFP+_r3_m9_MLN_tra"
           )
 
-# make_rarefaction_plots(mids_counts, grep("input", mid_names), rarefy=T)
+make_rarefaction_plots(mids_counts, grep("input", mid_names), rarefy=T)
 
 ## All
 make_full_heatmap(mids_counts, "horn",      mid_names, prefix="full", binary=F, types="square", cexRow=0.9, cexCol=0.9, tsne=T)

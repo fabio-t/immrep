@@ -89,15 +89,27 @@ R="R12"
 # migec="migec2"
 
 ## removed chimeric and pseudogenes
-# indices=`echo {1..11} {13..17} {19..30}`
-# exp_dir="200610_sc_seq"
-# exp_data_dir="200610_sc_seq"
-# migec="migec2"
+indices=`echo 230 240 250 260 {1..11} {13..17} {19..30}`
+exp_dir="200610_sc_seq"
+exp_data_dir="200610_sc_seq"
+migec="migec2"
 
 ## removed chimeric and pseudogenes
 # indices=`echo {35..44}`
 # exp_dir="180830_sort_2"
 # exp_data_dir="190715_treg"
+# migec="migec2"
+
+## removed chimeric and pseudogenes
+# indices=`echo 2 1 {4..11} 13 14 {25..33} {15..17} {19..24}`
+# exp_dir="180830_treg_2"
+# exp_data_dir="190715_treg"
+# migec="migec2"
+
+## removed chimeric and pseudogenes
+# indices=`echo {30..64}`
+# exp_dir="181204_treg_2"
+# exp_data_dir="181204_treg"
 # migec="migec2"
 
 ## removed chimeric and pseudogenes
@@ -119,10 +131,10 @@ R="R12"
 # migec="migec2"
 
 ## removed chimeric and pseudogenes
-indices=`echo {1..11} {13..17} {19..32}`
-exp_dir="171215_cultures_2"
-exp_data_dir="171215_cultures"
-migec="migec2"
+# indices=`echo {1..11} {13..17} {19..32}`
+# exp_dir="171215_cultures_2"
+# exp_data_dir="171215_cultures"
+# migec="migec2"
 
 ## removed chimeric and pseudogenes
 # indices=`echo {33..62}`

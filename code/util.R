@@ -875,10 +875,10 @@ make_radarchart <- function(data, column_names, labels = NULL, topN = NULL, topP
 
       # un-log it
       if (use_log) {
-        center_labels <- sprintf("%.3f", exp(center_labels) - 1)
+        center_labels <- sprintf("%.5f", exp(center_labels) - 1)
       }
       else {
-        center_labels <- sprintf("%.3f", center_labels)
+        center_labels <- sprintf("%.5f", center_labels)
       }
 
       # add the percent symbol

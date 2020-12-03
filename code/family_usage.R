@@ -72,7 +72,7 @@ for (f in Sys.glob("full/mid*"))
   chorddf <- as.data.frame(tab)
   grid.cols <- c(rep("grey", length(unique(chorddf$Var2))), rainbow(length(unique(chorddf$Var1))))
   labels <- c(names(sort(colSums(tab), decreasing = T)), names(sort(rowSums(tab), decreasing = T)))
-  chordDiagram(chorddf, link.rank = rank(chorddf[[3]]), order = labels, transparency = 0.05, grid.col = grid.cols, preAllocateTracks = list(track.height = max(strwidth(unlist(dimnames(chorddf))))), link.sort = T, link.decreasing = F, annotationTrack = "grid", annotationTrackHeight = 0.03)
+  chordDiagram(chorddf, link.zindex = rank(chorddf[[3]]), order = labels, transparency = 0.05, grid.col = grid.cols, preAllocateTracks = list(track.height = max(strwidth(unlist(dimnames(chorddf))))), link.sort = T, link.decreasing = F, annotationTrack = "grid", annotationTrackHeight = 0.03)
   circos.track(track.index = 1, panel.fun = function(x, y) {
     circos.text(CELL_META$xcenter, CELL_META$ylim[1], CELL_META$sector.index, cex = 0.5, facing = "clockwise", niceFacing = T, adj = c(0, 0.5))
   }, bg.border = NA)
