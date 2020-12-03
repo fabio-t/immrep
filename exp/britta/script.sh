@@ -1,6 +1,6 @@
 #!/bin/bash
 
-migec="migec"
+migec="migec2"
 data_type="bcr"
 safe="_safe"
 R="R12"
@@ -17,9 +17,13 @@ R="R12"
 # exp_dir="200623_iga"
 # exp_data_dir="200623_IBD_IgA"
 
-indices=`echo {22..40} 64`
-exp_dir="200625_igg"
-exp_data_dir="200625_IBD_IgG"
+# indices=`echo {22..40} 64`
+# exp_dir="200625_igg"
+# exp_data_dir="200625_IBD_IgG"
+
+indices=`echo {1..11} 13`
+exp_dir="200911_replicates"
+exp_data_dir="200911_mouse_SI_technical_replicates"
 
 # load and run script
 source ../../code/script.sh
