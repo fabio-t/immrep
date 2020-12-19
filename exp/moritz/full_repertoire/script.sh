@@ -1,6 +1,7 @@
 #!/bin/bash
 
-migec="migec"
+## removed chimeric and pseudogenes
+migec="migec2"
 data_type="tcr"
 safe="_safe"
 R="R12"
@@ -29,9 +30,9 @@ R="R12"
 # exp_dir="170927_capture"
 # exp_data_dir="170927_capture"
 
-# indices=`echo {40..64}`
-# exp_dir="171024_capture"
-# exp_data_dir="171024_capture"
+indices=`echo {40..64}`
+exp_dir="171024_capture_2"
+exp_data_dir="171024_capture"
 
 ## FIXME: originally there was this, but inside the script (for more recent
 ## experiments) we also add --type gene. To evaluate why not for Moritz
