@@ -1,5 +1,7 @@
 
-source("../../../../code/util.R")
+library(rprojroot)
+root <- is_vcs_root$make_fix_file()
+source(root("code/util.R"))
 
 # Va8 extracted from full repertoire: vancomycin
 mids_counts_full = read.csv("../170126_ql15_onlyVa8/mids_counts.csv", sep="\t", header=F)
@@ -22,15 +24,15 @@ colnames(mids_counts_va8) = c("input1", "input2", "input3",
                               "Ctrl1_MLN_FoxP3-", "Ctrl2_MLN_FoxP3-", "Ctrl3_MLN_FoxP3-",
                               "Ctrl1_SPL_FoxP3-", "Ctrl2_SPL_FoxP3-", "Ctrl3_SPL_FoxP3-",
                               "Ctrl1_LI_FoxP3-",  "Ctrl2_LI_FoxP3-",  "Ctrl3_LI_FoxP3-",
-                
+
                               "Ctrl1_MLN_FoxP3+", "Ctrl2_MLN_FoxP3+", "Ctrl3_MLN_FoxP3+",
                               "Ctrl1_SPL_FoxP3+", "Ctrl2_SPL_FoxP3+", "Ctrl3_SPL_FoxP3+",
                               "Ctrl1_LI_FoxP3+",  "Ctrl2_LI_FoxP3+",  "Ctrl3_LI_FoxP3+",
-                
+
                               "Van1_MLN_FoxP3-",  "Van2_MLN_FoxP3-",  "Van3_MLN_FoxP3-",
                               "Van1_SPL_FoxP3-",  "Van2_SPL_FoxP3-",  "Van3_SPL_FoxP3-",
                               "Van1_LI_FoxP3-",   "Van2_LI_FoxP3-",   "Van3_LI_FoxP3-",
-                
+
                               "Van1_MLN_FoxP3+",  "Van2_MLN_FoxP3+",  "Van3_MLN_FoxP3+",
                               "Van1_SPL_FoxP3+",  "Van2_SPL_FoxP3+",  "Van3_SPL_FoxP3+",
                               "Van1_LI_FoxP3+",   "Van2_LI_FoxP3+",   "Van3_LI_FoxP3+")

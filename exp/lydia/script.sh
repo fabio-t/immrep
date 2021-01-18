@@ -89,10 +89,10 @@ R="R12"
 # migec="migec2"
 
 ## removed chimeric and pseudogenes
-indices=`echo 230 240 250 260 {1..11} {13..17} {19..30}`
-exp_dir="200610_sc_seq"
-exp_data_dir="200610_sc_seq"
-migec="migec2"
+# indices=`echo 230 240 250 260 {1..11} {13..17} {19..30}`
+# exp_dir="200610_sc_seq"
+# exp_data_dir="200610_sc_seq"
+# migec="migec2"
 
 ## removed chimeric and pseudogenes
 # indices=`echo {35..44}`

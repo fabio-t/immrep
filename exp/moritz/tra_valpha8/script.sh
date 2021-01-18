@@ -1,44 +1,48 @@
 #!/bin/bash
 
 # trim="_trimmed"
-trim=""
 
 # qual=30
 # qual=20
 # qual=22
-qual=15
+# qual=15
 
 # indices=`echo {1..24}`
 # exp_dir="151102_ql${qual}${trim}"
 # exp_data_dir="151102_neomycin"
 
+## rerun with 3.0.13 and latest imgt
 # indices=`echo {1..21}`
-# exp_dir="160210_ql${qual}${trim}"
+# exp_dir="160210_ampicillin"
 # exp_data_dir="160210_ampicillin"
 
+## rerun with 3.0.13 and latest imgt
 # indices=`echo {1..39}`
-# exp_dir="151021_ql${qual}${trim}"
+# exp_dir="151021_neomycin"
 # exp_data_dir="151021_neomycin"
 
 # indices=`echo {1..39}`
 # exp_dir="160203_ql${qual}${trim}"
 # exp_data_dir="160203_ampicillin"
 
-# indices=`echo {1..31}`
-# exp_dir="160817_ql${qual}${trim}"
-# exp_data_dir="160817_prevotella"
+## rerun with 3.0.13 and latest imgt
+indices=`echo {1..31}`
+exp_dir="160817_prevotella"
+exp_data_dir="160817_prevotella"
 
 # indices=`echo {1..11} {13..17} {19..29}`
 # exp_dir="161004_ql${qual}${trim}"
 # exp_data_dir="161004_prevotella"
 
+## rerun with 3.0.13 and latest imgt
 # indices=`echo {1..21}`
-# exp_dir="160516_ql${qual}${trim}"
+# exp_dir="160516_diet"
 # exp_data_dir="160516_diet"
 
-indices=`echo {1..11} {13..17} {19..29} {32..41}`
-exp_dir="170126_vancomycin"
-exp_data_dir="170126_vancomycin/samples"
+## rerun with 3.0.13 and latest imgt
+# indices=`echo {1..11} {13..17} {19..29} {32..41}`
+# exp_dir="170126_vancomycin"
+# exp_data_dir="170126_vancomycin"
 
 # indices=`echo 17 {19..48} {50..55}`
 # exp_dir="170707_ql${qual}${trim}"
@@ -56,9 +60,10 @@ library="--library imgt"
 # library=""
 
 mkdir -p $exp_dir && cd $exp_dir
+echo `pwd`
 
 # mkdir align clns logs full
-mkdir logs full
+mkdir -p logs full
 
 rm logs/* full/*
 
@@ -69,8 +74,18 @@ do
     # mixcr exportClones -t -o -count -nFeature CDR3 -aaFeature CDR3 -vHit -jHit -fraction -f clns/mid${i}_clones.clns mid${i}_clones.csv || exit 1
     # mixcr exportClones -t -o -p full -f clns/mid${i}_clones.clns full/mid${i}_clones.csv || exit 1
 
-    mixcr analyze amplicon -s mouse --starting-material rna --5-end v-primers --3-end j-primers --adapters adapters-present --receptor-type TRA --align "-t 4 ${library}" --assemble "-t 4" --export "-p full" ../../../../local/mol_med/tcr_cd3/${exp_data_dir}/*MID${i}_*_R{1,2}_001${trim}.fastq logs/mid${i} || exit 1
-    mixcr exportClones -count -nFeature CDR3 -aaFeature CDR3 -vHit -jHit -fraction -f logs/mid${i}.clna mid${i}_clones.csv || exit 1
+    mixcr analyze amplicon \
+        -s mouse \
+        --starting-material rna \
+        --5-end v-primers --3-end j-primers \
+        --adapters adapters-present \
+        --receptor-type TRA \
+        --only-productive \
+        --threads 4 \
+        --library imgt \
+        --export "-p full" \
+        ../../../../local/mol_med/tcr/${exp_data_dir}/samples/*MID${i}_*_R{1,2}_001${trim}.fastq logs/mid${i} || exit 1
+    mixcr exportClones -count -nFeature CDR3 -aaFeature CDR3 -vHit -jHit -fraction -f logs/mid${i}.clns mid${i}_clones.csv || exit 1
     cp logs/mid${i}.clonotypes.TRA.txt full/mid${i}_clones.csv || exit 1
 done
 

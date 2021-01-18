@@ -19,10 +19,10 @@ install_github("fabio-t/mixed.utils")
 # install("/home/fabio/Research/mixed.utils")
 library(mixed.utils)
 
-heatmaps <- function(regexp, prefix = NULL, invert = F, cex = 0.9) {
+heatmaps <- function(regexp, prefix = NULL, invert = F, cex = 0.9, tsne = F) {
   if (is.null(regexp)) {
     ## All
-    make_full_heatmap(mids_counts, "horn", mid_names, prefix = "full", binary = F, types = "square", cexRow = cex, cexCol = cex, tsne = T)
+    make_full_heatmap(mids_counts, "horn", mid_names, prefix = "full", binary = F, types = "square", cexRow = cex, cexCol = cex, tsne = tsne)
     make_full_heatmap(mids_counts, "intersect", mid_names, prefix = "full", types = "square", vlim = c(0, NA), cexRow = cex, cexCol = cex)
     make_full_heatmap(mids_counts, "intersect", mid_names, prefix = "full_top0.85", topPerc = 0.85, types = "square", vlim = c(0, NA), cexRow = cex, cexCol = cex)
   } else {
@@ -30,13 +30,13 @@ heatmaps <- function(regexp, prefix = NULL, invert = F, cex = 0.9) {
     columns_i <- grep(regexp, mid_names, perl = T, invert = invert)
     columns_n <- mid_names[columns_i]
     data <- mids_counts[columns_i]
-    make_full_heatmap(data, "horn", columns_n, prefix = prefix, binary = F, types = "square", cexRow = cex, cexCol = cex, tsne = T)
+    make_full_heatmap(data, "horn", columns_n, prefix = prefix, binary = F, types = "square", cexRow = cex, cexCol = cex, tsne = tsne)
     make_full_heatmap(data, "intersect", columns_n, prefix = prefix, types = "square", vlim = c(0, NA), cexRow = cex, cexCol = cex)
     make_full_heatmap(data, "intersect", columns_n, prefix = paste0(prefix, "_top0.85"), topPerc = 0.85, types = "square", vlim = c(0, NA), cexRow = cex, cexCol = cex)
   }
 }
 
-radarcharts <- function(regexp, dirname, save = F, invert = F) {
+radarcharts <- function(regexp, dirname, save = F, invert = F, colours = NULL) {
   print(dirname)
 
   column_indices <- grep(regexp, mid_names, perl = T, invert = invert)
@@ -57,8 +57,8 @@ radarcharts <- function(regexp, dirname, save = F, invert = F) {
 
   if (save && (length(l$common_clones) > 0)) {
     # common clones
-    d1 <- sweep(data, 2, colSums(data), "/")[l$common_clones, ]
-    d2 <- data[l$common_clones, ]
+    d1 <- sweep(data, 2, colSums(data), "/")[l$common_clones, , drop=F]
+    d2 <- data[l$common_clones, , drop=F]
     d3 <- as.data.frame(colRanks(as.matrix(d2), preserveShape = T, ties.method = "average"))
     colnames(d1) <- column_names_2
     colnames(d2) <- column_names_2
@@ -71,8 +71,8 @@ radarcharts <- function(regexp, dirname, save = F, invert = F) {
 
   if (save && (length(l$total_clones) > 0)) {
     # common clones
-    d1 <- sweep(data, 2, colSums(data), "/")[l$total_clones, ]
-    d2 <- data[l$total_clones, ]
+    d1 <- sweep(data, 2, colSums(data), "/")[l$total_clones, , drop=F]
+    d2 <- data[l$total_clones, , drop=F]
     d3 <- as.data.frame(colRanks(as.matrix(d2), preserveShape = T, ties.method = "average"))
     colnames(d1) <- column_names_2
     colnames(d2) <- column_names_2
