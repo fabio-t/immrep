@@ -16,7 +16,6 @@ library(matrixStats)
 
 library(devtools)
 install_github("fabio-t/mixed.utils")
-# install("/home/fabio/Research/mixed.utils")
 library(mixed.utils)
 
 heatmaps <- function(regexp, prefix = NULL, invert = F, cex = 0.9, tsne = F) {
@@ -294,9 +293,6 @@ make_abundance_matrix <- function(df, topPerc = NULL, dirname = "dissimilarity",
   write.csv(abundance_matrix(df, topPerc = topPerc), file = paste0(dirname, "/", prefix, "_abund-inters.csv"))
 }
 
-colMax <- function(data) apply(data, 2, max, na.rm = TRUE)
-colMin <- function(data) apply(data, 2, min, na.rm = TRUE)
-
 logseq <- function(from, to, length.out) {
   exp(seq(log(from), log(to), length.out = length.out))
 }
@@ -432,37 +428,37 @@ make_input_histograms <- function(data, common, uncommon, columns, dirname = "di
   dev.off()
 }
 
-make_rarefaction_plots <- function(data, columns = NULL, dirname = "distributions", rarefy = T) {
+make_rarefaction_plots <- function(data, input_columns = NULL, dirname = "distributions", suffix = "", rarefy = T) {
   if (!dir.exists(dirname)) {
     dir.create(dirname, mode = "0755", recursive = T)
   }
 
-  if (!is.null(columns)) {
+  if (!is.null(input_columns)) {
     if (rarefy) {
-      min_count <- min(colSums(data[, columns]))
-      print(rarefy(t(data[, columns]), sample = min_count, se = T))
-      df <- rrarefy(t(data[, columns]), sample = min_count)
-      svg(paste0(dirname, "/", "rarefied_inputs.svg"))
+      min_count <- min(colSums(data[, input_columns]))
+      print(rarefy(t(data[, input_columns]), sample = min_count, se = T))
+      df <- rrarefy(t(data[, input_columns]), sample = min_count)
+      svg(paste0(dirname, "/", "rarefied_inputs", suffix, ".svg"))
       rarecurve(df, ylab = "Clones", xlab = "# Reads", col = rainbow(3))
       dev.off()
-      svg(paste0(dirname, "/", "rarefied_inputs_log.svg"))
+      svg(paste0(dirname, "/", "rarefied_inputs_log", suffix, ".svg"))
       rarecurve(df, ylab = "Clones", xlab = "# Reads", col = rainbow(3), log = "xy")
       dev.off()
     }
 
-    svg(paste0(dirname, "/", "unrarefied_inputs.svg"))
-    rarecurve(t(data[, columns]), step = 10, ylab = "Clones", xlab = "# Reads", col = rainbow(3))
+    svg(paste0(dirname, "/", "unrarefied_inputs", suffix, ".svg"))
+    rarecurve(t(data[, input_columns]), step = 10, ylab = "Clones", xlab = "# Reads", col = rainbow(3))
     dev.off()
-    svg(paste0(dirname, "/", "unrarefied_inputs_log.svg"))
-    rarecurve(t(data[, columns]), step = 10, ylab = "Clones", xlab = "# Reads", col = rainbow(3), log = "xy")
+    svg(paste0(dirname, "/", "unrarefied_inputs_log", suffix, ".svg"))
+    rarecurve(t(data[, input_columns]), step = 10, ylab = "Clones", xlab = "# Reads", col = rainbow(3), log = "xy")
     dev.off()
   }
 
-  svg(paste0(dirname, "/", "unrarefied_all.svg"))
+  svg(paste0(dirname, "/", "unrarefied_all", suffix, ".svg"))
   rarecurve(t(data), step = 10, ylab = "Clones", xlab = "# Reads", col = rainbow(ncol(data)))
   dev.off()
 
-  svg(paste0(dirname, "/", "unrarefied_all_log.svg"))
+  svg(paste0(dirname, "/", "unrarefied_all_log", suffix, ".svg"))
   rarecurve(t(data), step = 10, ylab = "Clones", xlab = "# Reads", col = rainbow(ncol(data)), log = "xy")
   dev.off()
 
@@ -470,10 +466,10 @@ make_rarefaction_plots <- function(data, columns = NULL, dirname = "distribution
     min_count <- min(colSums(data))
     print(rarefy(t(data), sample = min_count, se = T))
     df <- rrarefy(t(data), sample = min_count)
-    svg(paste0(dirname, "/", "rarefied_all.svg"))
+    svg(paste0(dirname, "/", "rarefied_all", suffix, ".svg"))
     rarecurve(df, ylab = "Clones", xlab = "# Reads", col = rainbow(3))
     dev.off()
-    svg(paste0(dirname, "/", "rarefied_all_log.svg"))
+    svg(paste0(dirname, "/", "rarefied_all_log", suffix, ".svg"))
     rarecurve(df, ylab = "Clones", xlab = "# Reads", col = rainbow(3), log = "xy")
     dev.off()
   }

@@ -34,6 +34,12 @@ R="R12"
 # exp_dir="171024_capture_2"
 # exp_data_dir="171024_capture"
 
+indices=`echo {30..32} {34..42}`
+exp_dir="210412_prevotella_rep"
+exp_data_dir="210412_prevotella_rep"
+R="R12_m1"
+migec="umis"
+
 ## FIXME: originally there was this, but inside the script (for more recent
 ## experiments) we also add --type gene. To evaluate why not for Moritz
 # ../../../../code/join_mids.py --unique $indices

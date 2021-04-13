@@ -29,7 +29,7 @@ R="R12"
 # exp_dir="170912_capture"
 # exp_data_dir="190320_capture"
 
-## removed chimeric and pseudogenes
+# ## removed chimeric and pseudogenes
 # indices=`echo {24..46}`
 # exp_dir="170912_capture_2"
 # exp_data_dir="190320_capture"
@@ -89,10 +89,10 @@ R="R12"
 # migec="migec2"
 
 ## removed chimeric and pseudogenes
-# indices=`echo 230 240 250 260 {1..11} {13..17} {19..30}`
-# exp_dir="200610_sc_seq"
-# exp_data_dir="200610_sc_seq"
-# migec="migec2"
+indices=`echo 230 240 250 260 {1..11} {13..17} {19..30}`
+exp_dir="200610_sc_seq"
+exp_data_dir="200610_sc_seq"
+migec="migec2"
 
 ## removed chimeric and pseudogenes
 # indices=`echo {35..44}`

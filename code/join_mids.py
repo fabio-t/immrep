@@ -37,10 +37,11 @@ for i in range(len(args.indices)):
         fields = l.split("\t")
 
         # fields:
-        # 0: quantity
+        # 0: count
         # 1: CDR3-nt
         # 2: CDR3-AA
-        # ...
+        # 3: V gene
+        # 4: J gene
 
         # we use CDR3-nt as key and we get the list of counts.
         # then we use the index i to increase the correct MID count

@@ -39,6 +39,15 @@ for (f in Sys.glob("mid*clones.csv"))
   name <- gsub(".csv$", "", basename(f))
 
   d <- read.csv(f, sep = "\t")
+
+  # fixes for mixcr and other tables
+  colnames(d) <- gsub("bestVHit", "V.segments", colnames(d))
+  colnames(d) <- gsub("v_gene", "V.segments", colnames(d))
+  colnames(d) <- gsub("bestJHit", "J.segments", colnames(d))
+  colnames(d) <- gsub("j_gene", "J.segments", colnames(d))
+  colnames(d) <- gsub("cloneFraction", "Percentage", colnames(d))
+  colnames(d) <- gsub("fraction", "Percentage", colnames(d))
+
   d$bestVFamily <- sapply(strsplit(as.character(d$V.segments), "[,\\*-]"), `[`, 1)
   d$bestJFamily <- sapply(strsplit(as.character(d$J.segments), "[,\\*-]"), `[`, 1)
   d$V.segments <- NULL

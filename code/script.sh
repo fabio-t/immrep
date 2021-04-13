@@ -1,4 +1,5 @@
 #!/bin/bash
+set -e
 
 # TODO this should be turned into functions, so scripts can compose it as they see fit
 
@@ -12,7 +13,7 @@
 echo $migec
 echo $safe
 echo $R
-echo $exp_data
+echo $exp_dir
 echo $exp_data_dir
 echo $data_type
 echo $indices
