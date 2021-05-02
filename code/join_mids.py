@@ -11,6 +11,8 @@ parser = ArgumentParser()
 # data input
 parser.add_argument("--unique", action="store_true", default=False, help="Don't use only the CDR3 region as key, but add V and J best hits")
 parser.add_argument("--exclude-j", action="store_true", default=False, help="If --unique is set, we may want to only use the V+CDR3 as key")
+parser.add_argument("--cdr3nt-only", action="store_true", default=False, help="If --unique is set, we may want to only use the CDR3 (nucleotides) as key")
+parser.add_argument("--cdr3aa-only", action="store_true", default=False, help="If --unique is set, we may want to only use the CDR3 (aminoacids) as key")
 parser.add_argument("--type", type=str, default='raw', choices=['gene', 'raw'])
 parser.add_argument("indices", type=int, nargs="+", help="the list of MIDs to use")
 
@@ -51,12 +53,16 @@ for i in range(len(args.indices)):
         if args.unique:
             v_hit = fields[3].split(",")[0].strip()
 
-            if not args.exclude_j:
-                j_hit = fields[4].split(",")[0].strip()
-
-                key = "%s_%s_%s" % (seq, tname(v_hit, args.type), tname(j_hit, args.type))
-            else:
+            if args.exclude_j:
                 key = "%s_%s" % (seq, tname(v_hit, args.type))
+            elif args.cdr3nt_only:
+                key = seq
+            elif args.cdr3aa_only:
+                seq = fields[2].strip()
+                key = seq
+            else:
+                j_hit = fields[4].split(",")[0].strip()
+                key = "%s_%s_%s" % (seq, tname(v_hit, args.type), tname(j_hit, args.type))
         else:
             key = seq
 

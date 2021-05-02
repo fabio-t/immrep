@@ -13,6 +13,9 @@ library(circlize)
 library(RColorBrewer)
 library(Rtsne)
 library(matrixStats)
+library(reshape2)
+library(tidyr)
+library(ggplot2)
 
 library(devtools)
 install_github("fabio-t/mixed.utils")
@@ -87,9 +90,12 @@ make_diversity <- function(mids_counts, mid_names) {
   divers_df <- as.data.frame(mid_names)
   rownames(divers_df) <- colnames(mids_counts)
   colnames(divers_df) <- "Sample"
-  divers_df$Shannon <- diversity(t(mids_counts), index = "shannon")
-  divers_df$ExpShannon <- exp(divers_df$Shannon)
-  divers_df$InvSimpson <- diversity(t(mids_counts), index = "invsimpson")
+  t_df <- t(mids_counts)
+  divers_df$NumberOfClones <- specnumber(t_df)
+  divers_df$Shannon <- diversity(t_df, index = "shannon")
+  divers_df$ShannonEvenness <- divers_df$Shannon / log(divers_df$NumberOfClones)
+  divers_df$InvSimpson <- diversity(t_df, index = "invsimpson")
+  divers_df$InvSimpsonEvenness <- divers_df$InvSimpson / divers_df$NumberOfClones
   write.csv(divers_df, file = "diversity.csv")
 }
 
@@ -260,7 +266,7 @@ abundance_matrix <- function(df, topPerc = NULL) {
   # extract the top % of clones and
   # the modified data (eg, for each organ the discarded
   # clones' abudance is set to zero)
-  data <- get_top_clones(df, topPerc = topPerc)
+  data <- get_top(df, topPerc = topPerc)
 
   n <- ncol(df)
   mat <- matrix(0, ncol = n, nrow = n)
@@ -307,65 +313,12 @@ get_present_clones <- function(column) {
   return(rownames(column))
 }
 
-get_top_clones <- function(data, topN = NULL, topPerc = NULL, min_clones = 3, exclude = NULL) {
-  columns <- setdiff(colnames(data), exclude)
-
-  if (!is.null(topN)) {
-    rows <- c()
-
-    topN <- max(topN, min_clones)
-
-    # for each column, take the topN clones (non-null rows)
-    # and merge them together.
-    for (column in columns)
-    {
-      df <- data[column]
-      df <- subset(df, df > 0)
-      df <- df[order(df[, c(1)], decreasing = T), c(1), drop = F]
-      df <- df[1:min(nrow(df), topN), , drop = F]
-
-      rows <- union(rows, rownames(df))
-    }
-  }
-  else if (!is.null(topPerc)) {
-    rows <- c()
-
-    # for each column, take the topPerc clones (non-null rows)
-    # and merge them together.
-    for (column in columns)
-    {
-      df <- data[column]
-      df <- subset(df, df > 0)
-      df <- df[order(df[, c(1)], decreasing = T), c(1), drop = F]
-      abundance <- sum(df) * topPerc
-      df_rows <- rownames(df)[cumsum(df) <= abundance]
-
-      # we force a minimum number of clones
-      n_clones <- max(length(df_rows), min_clones)
-      df_rows <- rownames(df)[1:n_clones]
-
-      # fix for issue identified on 29/05/2017:
-      # when we take the union (couple of lines below),
-      # some of the clones left out will "come back" for each organ (but they are NOT among the top for that organ!).
-      # so we set them to zero column by column, to make sure that the non-selected clones completely disappear.
-      data[setdiff(rownames(data), df_rows), column] <- 0
-
-      rows <- union(rows, df_rows)
-    }
-  }
-  else {
-    rows <- rownames(data)
-  }
-
-  return(data[rows, ])
-}
-
 make_full_heatmap <- function(data, method, labels = NULL, binary = F, dirname = "heatmaps",
                               prefix = "full", clustering = F, topN = NULL, topPerc = NULL, cexRow = 0.5,
                               cexCol = 0.5, types = c("square", "nonsquare"), vlim = NULL, scale = "none", tsne = F) {
   # the returned "data" must overwrite the parameter "data",
   # because we modified some of the cells (see the function body)
-  data <- get_top_clones(data, topN = topN, topPerc = topPerc)
+  data <- get_top(data, topN = topN, topPerc = topPerc)
 
   if (!is.null(labels)) {
     colnames(data) <- labels

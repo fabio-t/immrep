@@ -26,7 +26,7 @@ mid_names = c(
   "Treg_Prev_1"
 )
 
-make_rarefaction_plots(mids_counts, rarefy=T)
+# make_rarefaction_plots(mids_counts, rarefy=T)
 make_diversity(mids_counts, mid_names)
 
 ## heatmaps
