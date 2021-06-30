@@ -86,11 +86,82 @@ radarcharts <- function(regexp, dirname, save = F, invert = F, colours = NULL) {
   }
 }
 
+overview <- function(dirname = "overview", immdata = NULL) {
+  if (is.null(immdata)) {
+    library(immunarch)
+
+    immdata <- repLoad(paste0("full/", rownames(mid_labels), ".csv"))
+    # immdata <- repLoad(paste0(tolower(rownames(mid_labels)), "_clones.csv"))
+  }
+
+  dirname <- make_path(dirname)
+  print(dirname)
+
+  t1 <- repExplore(immdata$data, .method = "volume")
+  t2 <- repExplore(immdata$data, .method = "count")
+  vis(t1) + vis(t2) + theme_minimal(base_size=12) + theme(axis.text.x = element_text(angle = 90))
+  ggsave(filename = paste0(dirname, "basic.pdf"), width = 16, height = (9/16) * 16)
+
+  # div_hill <- repDiversity(immdata$data, "hill", .col="nt+v+j")
+  # p1 <- vis(div_hill, .meta = immdata$meta)
+  # p2 <- vis(div_hill, .by = c("Mouse"), .meta = immdata$meta)
+  # p3 <- vis(div_hill, .by = c("Organ"), .meta = immdata$meta)
+  # p4 <- vis(div_hill, .by = c("Mouse", "Organ"), .meta = immdata$meta)
+  # p1+p2+p3+p4
+  # ggsave("hill.pdf")
+  # imm_raref <- repDiversity(immdata$data, "raref", .verbose = F, .col = "nt+v+j")
+  # p1 <- vis(imm_raref, .meta = immdata$meta)
+  # p2 <- vis(imm_raref, .by = c("Mouse"), .meta = immdata$meta)
+  # p3 <- vis(imm_raref, .by = c("Organ"), .meta = immdata$meta)
+  # p4 <- vis(imm_raref, .by = c("Mouse", "Organ"), .meta = immdata$meta)
+  # p1+p2+p3+p4
+  # ggsave("raref.pdf")
+
+}
+
+track_clones <- function(regexp, dirname, invert = F, n = 15, immdata = NULL) {
+  if (is.null(immdata)) {
+    library(immunarch)
+
+    immdata <- repLoad(paste0("full/", rownames(mid_labels), ".csv"))
+    # immdata <- repLoad(paste0(tolower(rownames(mid_labels)), "_clones.csv"))
+  }
+
+  if (is.null(regexp)) {
+    # one-vs-all
+    dirname <- paste0("./tracking/all/")
+    dirname <- make_path(dirname)
+    print(dirname)
+
+    mid_list <- rownames(mid_labels)
+  } else {
+    dirname <- paste0("./tracking/", dirname, "/")
+    dirname <- make_path(dirname)
+    print(dirname)
+
+    column_indices <- grep(regexp, mid_names, perl = T, invert = invert)
+
+    mid_list <- colnames(mids_counts)[column_indices]
+    label_list <- mid_names[column_indices]
+
+    print(label_list)
+
+    immdata$data <- immdata$data[column_indices]
+  }
+
+  for (mid in mid_list) {
+    tc1 <- trackClonotypes(immdata$data, list(mid, n), .col = "v+nt+j")
+    vis(tc1) + theme_minimal(base_size=12) + theme(axis.text.x = element_text(angle = 90))
+    ggsave(filename = paste0(dirname, mid, ".pdf"), width = 16, height = (9/16) * 16)
+  }
+}
+
 make_diversity <- function(mids_counts, mid_names) {
   divers_df <- as.data.frame(mid_names)
   rownames(divers_df) <- colnames(mids_counts)
   colnames(divers_df) <- "Sample"
   t_df <- t(mids_counts)
+  divers_df$NumberOfCells <- rowSums(t_df)
   divers_df$NumberOfClones <- specnumber(t_df)
   divers_df$Shannon <- diversity(t_df, index = "shannon")
   divers_df$ShannonEvenness <- divers_df$Shannon / log(divers_df$NumberOfClones)
@@ -774,8 +845,8 @@ make_radarchart <- function(data, column_names, labels = NULL, topN = NULL, topP
   # to the original data (ie, before getting percentanges)
   orig_data <- as.data.frame(t(orig_data[common_rows, ]))
   colnames(orig_data) <- 1:ncol(orig_data)
-  organ_abund_counts <- rowSums(orig_data)
-  organ_abund_perc <- rowSums(data)
+  organ_abund_counts <- rowSums(orig_data, na.rm=T)
+  organ_abund_perc <- rowSums(data, na.rm=T)
 
   print("organ abundance:")
   print(organ_abund_counts)
@@ -784,17 +855,19 @@ make_radarchart <- function(data, column_names, labels = NULL, topN = NULL, topP
   if (minmax == "global") {
     # global minimum and maximum: this makes it easier to see
     # print(data)
-    print(max(data))
-    print(min(data))
-    data <- rbind(max(data), min(data), data)
+    minv <- min(sapply(data, FUN=function(x){x=x[is.finite(x)]; min(x)}))
+    print(minv)
+    maxv <- max(sapply(data, FUN=function(x){x=x[is.finite(x)]; max(x)}))
+    print(maxv)
+    data <- rbind(maxv, minv, data)
   }
   else if (minmax == "by-column") {
     # by-organ max/min: might be hard to visualise
-    data <- rbind(colMax(data), colMin(data), data)
+    data <- rbind(colMax(data, na.rm=T), colMin(data, na.rm=T), data)
   }
   else if (minmax == "by-row") {
     # by-organ max/min: might be hard to visualise
-    data <- rbind(rowMax(data), rowMin(data), data)
+    data <- rbind(rowMax(data, na.rm=T), rowMin(data, na.rm=T), data)
   }
   else if (length(minmax) == 2) {
     # [min, max]

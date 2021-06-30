@@ -38,7 +38,13 @@ for (f in Sys.glob("mid*clones.csv"))
 {
   name <- gsub(".csv$", "", basename(f))
 
+  print(name)
+
   d <- read.csv(f, sep = "\t")
+
+  if (nrow(d) == 0) {
+    next
+  }
 
   # fixes for mixcr and other tables
   colnames(d) <- gsub("bestVHit", "V.segments", colnames(d))
