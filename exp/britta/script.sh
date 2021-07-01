@@ -2,7 +2,7 @@
 
 data_type="bcr"
 resdir="umis"
-safe="_safe"
+safe="_safe_long"
 R="R12"
 tool="migec"
 

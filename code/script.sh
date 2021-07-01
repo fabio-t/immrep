@@ -34,16 +34,16 @@ for i in $indices
 do
     if [[ $tool == "migec" ]]
     then
-      cat ${data_prefix}/${resdir}/${R}${m}/cdrfinal_${i}${safe}/S0_${R}.csv | awk -F"\t" '{print $1"\t"$3"\t"$4"\t"$5"\t"$6"\t"$2}' > mid${i}_clones.csv
-      cat ${data_prefix}/${resdir}/${R}${m}/cdrfinal_${i}${safe}/S0_${R}.csv > full/MID${i}.csv
+      cat ${data_prefix}/${resdir}/${R}${m}${safe}/cdrfinal_${i}/S0_${R}.csv | awk -F"\t" '{print $1"\t"$3"\t"$4"\t"$5"\t"$6"\t"$2}' > mid${i}_clones.csv
+      cat ${data_prefix}/${resdir}/${R}${m}${safe}/cdrfinal_${i}/S0_${R}.csv > full/MID${i}.csv
     else
-      mixcr exportClones -t -o -count -fraction -nFeature CDR3 -aaFeature CDR3 -vHit -jHit -dHit -cHit -f ${data_prefix}/${resdir}/${R}${m}/mixcr_${i}/analysis.*clns mid${i}_clones.csv
-      mixcr exportClones -t -o -vHit -jHit -dHit -cHit -p full -f ${data_prefix}/${resdir}/${R}${m}/mixcr_${i}/analysis.*clns full/MID${i}.csv
+      mixcr exportClones -t -o -count -fraction -nFeature CDR3 -aaFeature CDR3 -vHit -jHit -dHit -cHit -f ${data_prefix}/${resdir}/${R}${m}${safe}/mixcr_${i}/analysis.*clns mid${i}_clones.csv
+      mixcr exportClones -t -o -vHit -jHit -dHit -cHit -p full -f ${data_prefix}/${resdir}/${R}${m}${safe}/mixcr_${i}/analysis.*clns full/MID${i}.csv
       # cp ${data_prefix}/${resdir}/${R}${m}/mixcr_${i}/*clonotypes*.txt full/MID${i}.csv
     fi
     cat mid${i}_clones.csv |  awk '{print $2}' | sort -k1,1 | uniq -c | awk '{if($1 > 1){print $0}}' | sort -k1,1 -r > collisions/mid${i}_collision.csv
 done
-cp ${data_prefix}/${resdir}/${R}${m}/*.csv stats/
+cp ${data_prefix}/${resdir}/${R}${m}${safe}/*.csv stats/
 cp ${data_prefix}/r{1,2}_stats.csv stats/
 [ -f "${data_prefix}/../mid_labels.csv" ] && cp ${data_prefix}/../mid_labels.csv .
 
