@@ -7,6 +7,7 @@ library(vegan)
 library(gplots)
 library(venneuler)
 library(plyr)
+library(dplyr) # always after plyr
 library(randomcoloR)
 library(fmsb)
 library(circlize)
@@ -84,6 +85,72 @@ radarcharts <- function(regexp, dirname, save = F, invert = F, colours = NULL) {
     write.csv(d2, file = paste0(dirname, "total_clones_counts.csv"))
     write.csv(d3, file = paste0(dirname, "total_clones_ranks.csv"))
   }
+}
+
+consensus_nt <- function(x){consensusString(DNAStringSet(x))}
+consensus_aa <- function(x){consensusString(AAStringSet(x))}
+
+cloneclust <- function(x, h=0.15) {
+  if(length(x) == 1){return(1)}
+
+  aa_seqs <- as.matrix(as.AAbin(AAStringSet(x)))
+  seq_dist <- dist.aa(aa_seqs, scaled=T)
+  cl <- hclust(seq_dist, method="average")
+  cl$height = round(cl$height, digits=8)
+  cutree(cl, h=h)
+}
+
+clones2groups <- function(immdata = NULL, overwrite = T) {
+  if (is.null(immdata)) {
+    library(immunarch)
+
+    immdata <- repLoad(paste0("full/", rownames(mid_labels), ".csv"))
+    # immdata <- repLoad(paste0(tolower(rownames(mid_labels)), "_clones.csv"))
+  }
+
+  library(dplyr)
+  library(stringr)
+  library(Biostrings)
+  library(ape)
+
+  for (name in names(immdata$data)) {
+    d <- immdata$data[[name]]
+
+    d2 <- d %>%
+          mutate(len=str_length(CDR3.nt)) %>%
+          group_by(V.name, J.name, len) %>%
+          mutate(cluster=cloneclust(CDR3.aa, 0.85)) %>%
+          group_by(cluster, .add=T) %>%
+          summarise(n=n(), Clones=sum(Clones), Proportion=sum(Proportion),
+                    CDR3.nt=consensus_nt(CDR3.nt),
+                    # CDR3.aa=consensus_aa(CDR3.aa),
+                    CDR3.aa=as.character(translate(DNAString(CDR3.nt), if.fuzzy.codon="solve")),
+                    D.name, V.end, D.start, D.end,
+                    J.start, VJ.ins, VD.ins, DJ.ins
+                    ) %>%
+          slice_head() %>%
+          ungroup() %>%
+          arrange(desc(Clones))
+
+    immdata$data[[name]] <- d2
+  }
+
+  if (overwrite) {
+    for (name in names(immdata$data)) {
+      d <- immdata$data[[name]]
+      d <- d %>%
+           ungroup() %>%
+           select(cloneCount = Clones, nSeqCDR3 = CDR3.nt, aaSeqCDR3 = CDR3.aa,
+                  bestVHit = V.name, bestJHit = J.name, bestDHit = D.name, n,
+                  len, cloneFraction = Proportion) %>%
+           as.data.frame()
+
+      write.table(d, file=paste0(tolower(name), "_clones.csv"),
+                  quote=F, row.names=F, sep="\t")
+    }
+  }
+
+  return(immdata)
 }
 
 overview <- function(dirname = "overview", immdata = NULL) {

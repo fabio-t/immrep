@@ -13,17 +13,19 @@ parser.add_argument("--unique", action="store_true", default=False, help="Don't 
 parser.add_argument("--exclude-j", action="store_true", default=False, help="If --unique is set, we may want to only use the V+CDR3 as key")
 parser.add_argument("--cdr3nt-only", action="store_true", default=False, help="If --unique is set, we may want to only use the CDR3 (nucleotides) as key")
 parser.add_argument("--cdr3aa-only", action="store_true", default=False, help="If --unique is set, we may want to only use the CDR3 (aminoacids) as key")
-parser.add_argument("--type", type=str, default='raw', choices=['gene', 'raw'])
+parser.add_argument("--type", type=str, default='raw', choices=['raw', 'gene', 'family'])
 parser.add_argument("indices", type=int, nargs="+", help="the list of MIDs to use")
 
 args = parser.parse_args()
 
+# FIXME it doesn't account for a LIST of hits
 def tname(s, t):
     if t == 'gene':
-        s = re.sub('\*..', '', s)
+        s = re.sub('\*[0-9]+$', '', s)
         return s
-    # elif t == 'family':
-    #     return s
+    elif t == 'family':
+        s = re.sub('-.*$', '', s)
+        return s
     else:
         return s
 

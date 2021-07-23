@@ -48,8 +48,10 @@ for (f in Sys.glob("mid*clones.csv"))
 
   # fixes for mixcr and other tables
   colnames(d) <- gsub("bestVHit", "V.segments", colnames(d))
+  colnames(d) <- gsub("bestVGene", "V.segments", colnames(d))
   colnames(d) <- gsub("v_gene", "V.segments", colnames(d))
   colnames(d) <- gsub("bestJHit", "J.segments", colnames(d))
+  colnames(d) <- gsub("bestJGene", "J.segments", colnames(d))
   colnames(d) <- gsub("j_gene", "J.segments", colnames(d))
   colnames(d) <- gsub("cloneFraction", "Percentage", colnames(d))
   colnames(d) <- gsub("fraction", "Percentage", colnames(d))
