@@ -39,7 +39,12 @@ cf2=".cf"
 #germline="--impute-germline-on-export"
 #contig="--contig-assembly"
 
-imgt=${imgt+"-b imgt"}
+if [ -z $imgt ] || [ $imgt != "y" ]
+then
+  imgt="-b imgt"
+else
+  imgt=""
+fi
 
 # quality="--assemble -OmaxBadPointsPercent=0"
 # quality="--assemble -OmaxBadPointsPercent=0.05"

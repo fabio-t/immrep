@@ -13,11 +13,11 @@ mid_labels <- read.csv("mid_labels.csv", row.names=1)
 print(mid_labels)
 mid_names <- mid_labels[colnames(mids_counts), "label", drop=T]
 
-# iga_samples <- grep("IgA", mid_names)
-# igg_samples <- grep("IgG", mid_names)
-# make_rarefaction_plots(mids_counts[iga_samples], rarefy=T, suffix = "_iga")
-# make_rarefaction_plots(mids_counts[igg_samples], rarefy=T, suffix = "_igg")
-# make_diversity(mids_counts, mid_names)
+iga_samples <- grep("IgA", mid_names)
+igg_samples <- grep("IgG", mid_names)
+make_rarefaction_plots(mids_counts[iga_samples], rarefy=T, suffix = "_iga")
+make_rarefaction_plots(mids_counts[igg_samples], rarefy=T, suffix = "_igg")
+make_diversity(mids_counts, mid_names)
 
 ## heatmaps
 heatmaps(NULL, NULL, cex = 0.5, tsne = T)

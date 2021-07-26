@@ -60,6 +60,12 @@ cp ${data_prefix}/r{1,2}_stats.csv stats/
 [ -f "${data_prefix}/../mid_labels.csv" ] && cp ${data_prefix}/../mid_labels.csv .
 
 # TODO: need a script to remove duplicates in place and recalculate counts and frequencies (for cristoph's scripts)
+# might only be needed for t-cells as b-cells will be corrected via the below script
+
+if [ $data_type == "bcr" ]
+then
+  Rscript /mnt/storage/data/code/clones2groups.R
+fi
 
 /mnt/storage/data/code/join_mids.py --unique --type $jointype $indices
 

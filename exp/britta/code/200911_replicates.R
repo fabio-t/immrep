@@ -5,14 +5,15 @@ root <- is_vcs_root$make_fix_file()
 
 source(root("code/util.R"))
 
-# calculate frequencies from counts
-mids_counts = read.csv("mids_counts.csv", sep="\t", row.names = 1)
-
 mid_labels <- read.csv("mid_labels.csv", row.names=1)
 print(mid_labels)
+
+idata <- clones2groups()
+
+mids_counts = read.csv("mids_counts.csv", sep="\t", row.names = 1)
 mid_names <- mid_labels[colnames(mids_counts), "label", drop=T]
 
-overview()
+overview(immdata=idata)
 make_rarefaction_plots(mids_counts, rarefy=T)
 make_diversity(mids_counts, mid_names)
 
@@ -36,10 +37,10 @@ for (tp in c(1, 0.85)) {
   radarcharts("(m1|m2 rep[37])", "m1_plus_m2-rep3and7",  save=T)
 }
 
-track_clones(NULL, NULL)
-track_clones("rep7", "no_m2rep7", invert = T)
-track_clones("m1", "m1")
-track_clones("m2", "m2")
-track_clones("m2 rep[^7]", "m2_norep7")
-track_clones("rep7", "m1m2_norep7", invert=T)
-track_clones("(m1|m2 rep[37])", "m1_plus_m2-rep3and7")
+track_clones(NULL, NULL, immdata=idata)
+track_clones("rep7", "no_m2rep7", invert = T, immdata=idata)
+track_clones("m1", "m1", immdata=idata)
+track_clones("m2", "m2", immdata=idata)
+track_clones("m2 rep[^7]", "m2_norep7", immdata=idata)
+track_clones("rep7", "m1m2_norep7", invert=T, immdata=idata)
+track_clones("(m1|m2 rep[37])", "m1_plus_m2-rep3and7", immdata=idata)
