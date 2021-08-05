@@ -5,52 +5,65 @@ root <- is_vcs_root$make_fix_file()
 
 source(root("code/util.R"))
 
-# calculate frequencies from counts
-mids_counts = read.csv("mids_counts.csv", sep="\t", row.names = 1)
-mids_counts = mids_counts[grep("MID34", colnames(mids_counts), invert=T)] # asked to exclude MID34
-
 mid_labels <- read.csv("mid_labels.csv", row.names=1)
 print(mid_labels)
+
+idata <- immload(which="not full")
+
+mids_counts = read.csv("mids_counts.csv", sep="\t", row.names = 1)
 mid_names <- mid_labels[colnames(mids_counts), "label", drop=T]
 
-iga_samples <- grep("IgA", mid_names)
-igg_samples <- grep("IgG", mid_names)
-make_rarefaction_plots(mids_counts[iga_samples], rarefy=T, suffix = "_iga")
-make_rarefaction_plots(mids_counts[igg_samples], rarefy=T, suffix = "_igg")
+# mids_counts = mids_counts[grep("MID34", colnames(mids_counts), invert=T)] # asked to exclude MID34
+
+overview(immdata=idata)
+
+iga_samples <- grep("iga", mid_names)
+igg_samples <- grep("igg", mid_names)
+# make_rarefaction_plots(mids_counts[iga_samples], suffix = "_iga")
+# make_rarefaction_plots(mids_counts[igg_samples], suffix = "_igg")
 make_diversity(mids_counts, mid_names)
 
 ## heatmaps
 heatmaps(NULL, NULL, cex = 0.5, tsne = T)
-heatmaps("IgA", "iga")
-heatmaps("IgG", "igg")
+heatmaps("iga", "iga")
+heatmaps("igg", "igg")
 
 ## radarcharts
 # for (tp in c(0.85)) {
-# # for (tp in c(1, 0.85)) {
-#   radarcharts("^(IgA_ID5_non-inf|IgA_ID5_inf|IgA_ID10_non-inf1)$", "mid2-3-4",  save=T)
-#   radarcharts("IgA_ID", "IgA_ID",  save=T)
-#   radarcharts("IgA_SI", "IgA_SI",  save=T)
-#   radarcharts("IgG_ID", "IgG_ID",  save=T)
-#   radarcharts("IgG_SI", "IgG_SI",  save=T)
-# }
-
-library(treemap)
-dirname = make_path("treemaps")
-for (column in colnames(mids_counts)) {
-  mid_df <- cbind(clones=rownames(mids_counts), mids_counts[column])
-  mid_df$freq <- mid_df[,column] / sum(mid_df[,column])
-
-  print(head(mid_df))
-
-  mid_df2 <- get_top_clones(mid_df, topN=10, exclude=c("clones", column))
-  print(head(mid_df2))
-  svg(paste0(dirname, column, "_top10.svg"))
-  treemap(mid_df2, index="clones", vSize="freq")
-  dev.off()
-
-  mid_df2 <- get_top_clones(mid_df, topPerc=0.15, exclude=c("clones", column))
-  print(head(mid_df2))
-  svg(paste0(dirname, column, "_top15perc.svg"))
-  treemap(mid_df2, index="clones", vSize="freq")
-  dev.off()
+for (tp in c(1, 0.85)) {
+  radarcharts("^(Healthy_p5_iga|IBD_p5_iga|Healthy_p10_1_iga)$", "mid2-3-4",  save=T)
+  radarcharts("IBD.*iga", "iga_IBD",  save=T)
+  radarcharts("SI.*iga", "iga_SI",  save=T)
+  radarcharts("IBD.*igg", "igg_IBD",  save=T)
+  radarcharts("SI.*igg", "igg_SI",  save=T)
 }
+
+track_clones(NULL,  NULL,  immdata=idata)
+track_clones("iga", "iga", immdata=idata)
+track_clones("igg", "igg", immdata=idata)
+track_clones("^(Healthy_p5_iga|IBD_p5_iga|Healthy_p10_1_iga)$", "mid2-3-4", immdata=idata)
+track_clones("IBD.*iga", "iga_IBD", immdata=idata)
+track_clones("SI.*iga", "iga_SI",   immdata=idata)
+track_clones("IBD.*igg", "igg_IBD", immdata=idata)
+track_clones("SI.*igg", "igg_SI",   immdata=idata)
+
+# library(treemap)
+# dirname = make_path("treemaps")
+# for (column in colnames(mids_counts)) {
+#   mid_df <- cbind(clones=rownames(mids_counts), mids_counts[column])
+#   mid_df$freq <- mid_df[,column] / sum(mid_df[,column])
+#
+#   print(head(mid_df))
+#
+#   mid_df2 <- get_top(mid_df, topN=10, exclude=c("clones", column))
+#   print(head(mid_df2))
+#   svg(paste0(dirname, column, "_top10.svg"))
+#   treemap(mid_df2, index="clones", vSize="freq")
+#   dev.off()
+#
+#   mid_df2 <- get_top(mid_df, topPerc=0.15, exclude=c("clones", column))
+#   print(head(mid_df2))
+#   svg(paste0(dirname, column, "_top15perc.svg"))
+#   treemap(mid_df2, index="clones", vSize="freq")
+#   dev.off()
+# }

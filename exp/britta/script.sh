@@ -1,6 +1,7 @@
 #!/bin/bash
 
 data_type="bcr"
+chain="IGH" # some experiments might require something different
 resdir="umis"
 bc="_safe_long"
 R="R12"
@@ -19,24 +20,12 @@ jointype="raw" # because it's clonal trees, we already strip alleles
 # exp_data_dir="181105_iga"
 # ql=
 
-# m="b"
-# indices=`echo {2..7} 11 {13..17} {19..21}`
-# exp_dir="200623_iga"
-# exp_data_dir="200623_IBD_IgA"
-# ql=
-
-# m="b"
-# indices=`echo {22..40} 64`
-# exp_dir="200625_igg"
-# exp_data_dir="200625_IBD_IgG"
-# ql=
-
-# m="b"
-# indices=`echo {2..7} 11 {13..17} {19..21} {22..40} 64`
-# bc="_safe"
-# exp_dir="200623-5_iga-igg"
-# exp_data_dir="200623_IgA-200625-IgG__IBD"
-# ql=mix
+m="b"
+indices=`echo {2..7} 11 {13..17} {19..21} {22..40} 64`
+bc="_safe"
+exp_dir="200623-5_iga-igg"
+exp_data_dir="200623_IgA-200625-IgG__IBD"
+ql=mix
 
 # m="b"
 # indices=`echo {1..11} 13`
@@ -44,11 +33,11 @@ jointype="raw" # because it's clonal trees, we already strip alleles
 # exp_data_dir="200911_mouse_SI_technical_replicates"
 # ql=20
 
-m="b"
-indices=`echo 43 {45..55} {57..69}`
-exp_dir="210329_diversity_si"
-exp_data_dir="210329_diversity_si"
-ql=20
+# m="b"
+# indices=`echo 43 {45..55} {57..69}`
+# exp_dir="210329_diversity_si"
+# exp_data_dir="210329_diversity_si"
+# ql=20
 
 # m="b"
 # indices=`echo 30 32 35 37 38 39 45 57 58 61 63 67 68 73`

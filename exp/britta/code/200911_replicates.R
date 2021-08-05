@@ -8,7 +8,7 @@ source(root("code/util.R"))
 mid_labels <- read.csv("mid_labels.csv", row.names=1)
 print(mid_labels)
 
-idata <- clones2groups()
+idata <- immload(which="not full")
 
 mids_counts = read.csv("mids_counts.csv", sep="\t", row.names = 1)
 mid_names <- mid_labels[colnames(mids_counts), "label", drop=T]

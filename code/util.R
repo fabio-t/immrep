@@ -100,12 +100,25 @@ cloneclust <- function(x, h=0.15) {
   cutree(cl, h=h)
 }
 
-clones2groups <- function(immdata = NULL, overwrite = T) {
-  if (is.null(immdata)) {
-    library(immunarch)
+immload <- function(which="full") {
+  library(immunarch)
 
-    immdata <- repLoad(paste0("full/", rownames(mid_labels), ".csv"))
-    # immdata <- repLoad(paste0(tolower(rownames(mid_labels)), "_clones.csv"))
+  if (which == "full") {
+    immdata <- repLoad(paste0("full/", rownames(mid_labels), ".csv"), .coding=F)
+  } else {
+    immdata <- repLoad(paste0(tolower(rownames(mid_labels)), "_clones.csv"), .coding=F)
+    names(immdata$data) <- toupper(gsub("_clones", "", names(immdata$data)))
+  }
+
+  meta <- cbind(Sample=rownames(mid_labels), mid_labels)
+  immdata$meta <- as_tibble(mid_labels)
+
+  return(immdata)
+}
+
+clones2groups <- function(immdata = NULL, overwrite = F) {
+  if (is.null(immdata)) {
+    immdata <- immload()
   }
 
   library(dplyr)
@@ -145,8 +158,8 @@ clones2groups <- function(immdata = NULL, overwrite = T) {
                   len, cloneFraction = Proportion) %>%
            as.data.frame()
 
-      write.table(d, file=paste0(tolower(name), "_clones.csv"),
-                  quote=F, row.names=F, sep="\t")
+      write.table(d, file=paste0(tolower(name), "_clones.csv"), quote=F, row.names=F, sep="\t")
+      # write.table(d, file=paste0("full/", name, ".csv"), quote=F, row.names=F, sep="\t")
     }
   }
 
@@ -155,10 +168,7 @@ clones2groups <- function(immdata = NULL, overwrite = T) {
 
 overview <- function(dirname = "overview", immdata = NULL) {
   if (is.null(immdata)) {
-    library(immunarch)
-
-    immdata <- repLoad(paste0("full/", rownames(mid_labels), ".csv"))
-    # immdata <- repLoad(paste0(tolower(rownames(mid_labels)), "_clones.csv"))
+    immdata <- immload()
   }
 
   dirname <- make_path(dirname)
@@ -188,10 +198,7 @@ overview <- function(dirname = "overview", immdata = NULL) {
 
 track_clones <- function(regexp, dirname, invert = F, n = 15, immdata = NULL) {
   if (is.null(immdata)) {
-    library(immunarch)
-
-    immdata <- repLoad(paste0("full/", rownames(mid_labels), ".csv"))
-    # immdata <- repLoad(paste0(tolower(rownames(mid_labels)), "_clones.csv"))
+    immdata <- immload()
   }
 
   if (is.null(regexp)) {

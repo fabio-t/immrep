@@ -31,6 +31,7 @@ echo $exp_dir
 echo ${exp_dir}_${tool}-m${m1}
 echo $exp_data_dir
 echo $data_type
+echo $chain
 echo $indices
 echo $jointype
 
@@ -47,10 +48,10 @@ do
       cat ${data_prefix}/${resdir}/${R}${m}${bc}${ql}/cdrfinal_${i}/S0_${R}.csv | awk -F"\t" '{print $1"\t"$3"\t"$4"\t"$5"\t"$6"\t"$2}' > mid${i}_clones.csv
       cat ${data_prefix}/${resdir}/${R}${m}${bc}${ql}/cdrfinal_${i}/S0_${R}.csv > full/MID${i}.csv
     else
-      mixcr exportClones -t -o -count -nFeature CDR3 -aaFeature CDR3 -vHit -jHit -dHit -fraction -f ${data_prefix}/${resdir}/${R}${m}${bc}${ql}/mixcr_${i}/analysis.*clns mid${i}_clones.csv
+      mixcr exportClones -c $chain -t -o -count -nFeature CDR3 -aaFeature CDR3 -vHit -jHit -dHit -fraction -f ${data_prefix}/${resdir}/${R}${m}${bc}${ql}/mixcr_${i}/analysis.*clns mid${i}_clones.csv
       # mixcr exportClones -t -o -count -nFeature CDR3 -aaFeature CDR3 -vHit -jHit -dHit -cHit -fraction -f ${data_prefix}/${resdir}/${R}${m}${bc}${ql}/mixcr_${i}/analysis.*clns mid${i}_clones.csv
       # mixcr exportClones -t -o -count -nFeature CDR3 -aaFeature CDR3 -vGene -jGene -dGene -cGene -fraction -f ${data_prefix}/${resdir}/${R}${m}${bc}${ql}/mixcr_${i}/analysis.*clns mid${i}_clones.csv
-      mixcr exportClones -t -o -vHit -jHit -dHit -cHit -p full -f ${data_prefix}/${resdir}/${R}${m}${bc}${ql}/mixcr_${i}/analysis.*clns full/MID${i}.csv
+      mixcr exportClones -c $chain -t -o -vHit -jHit -dHit -cHit -p full -f ${data_prefix}/${resdir}/${R}${m}${bc}${ql}/mixcr_${i}/analysis.*clns full/MID${i}.csv
       # cp ${data_prefix}/${resdir}/${R}${m}/mixcr_${i}/*clonotypes*.txt full/MID${i}.csv
     fi
     cat mid${i}_clones.csv |  awk '{print $2}' | sort -k1,1 | uniq -c | awk '{if($1 > 1){print $0}}' | sort -k1,1 -r > collisions/mid${i}_collision.csv
