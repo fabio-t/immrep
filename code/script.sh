@@ -66,6 +66,11 @@ cp ${data_prefix}/r{1,2}_stats.csv stats/
 if [ $data_type == "bcr" ]
 then
   Rscript /mnt/storage/data/code/clones2groups.R
+
+  for i in $indices
+  do
+    cat mid${i}_clones.csv |  awk '{print $2}' | sort -k1,1 | uniq -c | awk '{if($1 > 1){print $0}}' | sort -k1,1 -r > collisions/mid${i}_collision.csv
+  done
 fi
 
 /mnt/storage/data/code/join_mids.py --unique --type $jointype $indices

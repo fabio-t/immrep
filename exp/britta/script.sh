@@ -10,22 +10,25 @@ jointype="raw" # because it's clonal trees, we already strip alleles
 
 # m="b"
 # indices=`echo 16 17 19 20 {22..28} 38 {61..69}`
+# bc="_safe"
 # exp_dir="181019_igg"
 # exp_data_dir="181019_igg"
-# ql=
+# ql=20
 
 # m="b"
 # indices=`echo {40..60}`
+# bc="_safe"
 # exp_dir="181105_iga"
 # exp_data_dir="181105_iga"
-# ql=
+# ql=15
 
-m="b"
-indices=`echo {2..7} 11 {13..17} {19..21} {22..40} 64`
-bc="_safe"
-exp_dir="200623-5_iga-igg"
-exp_data_dir="200623_IgA-200625-IgG__IBD"
-ql=mix
+# TODO rerun
+# m="b"
+# indices=`echo {2..7} 11 {13..17} {19..21} {22..40} 64`
+# bc="_safe"
+# exp_dir="200623-5_iga-igg"
+# exp_data_dir="200623_IgA-200625-IgG__IBD"
+# ql=mix
 
 # m="b"
 # indices=`echo {1..11} 13`
@@ -45,11 +48,11 @@ ql=mix
 # exp_data_dir="210426_diversity_dual_indices"
 # ql=15
 
-# m="b"
-# indices=`echo {30..44}`
-# exp_dir="200709_comparison"
-# exp_data_dir="200709_comparison_IgA_liver_gut"
-# ql=15
+m="b"
+indices=`echo {30..44}`
+exp_dir="200709_comparison"
+exp_data_dir="200709_comparison_IgA_liver_gut"
+ql=15
 
 # m="b"
 # indices=`echo {1..15}`

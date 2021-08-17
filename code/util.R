@@ -90,6 +90,7 @@ radarcharts <- function(regexp, dirname, save = F, invert = F, colours = NULL) {
 consensus_nt <- function(x){consensusString(DNAStringSet(x))}
 consensus_aa <- function(x){consensusString(AAStringSet(x))}
 
+# by default, two clones are split if they have < 85% similarity
 cloneclust <- function(x, h=0.15) {
   if(length(x) == 1){return(1)}
 
@@ -97,6 +98,8 @@ cloneclust <- function(x, h=0.15) {
   seq_dist <- dist.aa(aa_seqs, scaled=T)
   cl <- hclust(seq_dist, method="average")
   cl$height = round(cl$height, digits=8)
+  # plot(cl)
+  # rect.hclust(cl, h=h, border="red")
   cutree(cl, h=h)
 }
 
@@ -116,7 +119,7 @@ immload <- function(which="full") {
   return(immdata)
 }
 
-clones2groups <- function(immdata = NULL, overwrite = F) {
+clones2groups <- function(immdata = NULL, overwrite = F, savefasta = F) {
   if (is.null(immdata)) {
     immdata <- immload()
   }
@@ -132,20 +135,27 @@ clones2groups <- function(immdata = NULL, overwrite = F) {
     d2 <- d %>%
           mutate(len=str_length(CDR3.nt)) %>%
           group_by(V.name, J.name, len) %>%
-          mutate(cluster=cloneclust(CDR3.aa, 0.85)) %>%
-          group_by(cluster, .add=T) %>%
+          mutate(id=str_c(cur_group_id(), cloneclust(CDR3.aa, 0.2), sep=".")) %>%
+          group_by(id, .add=T)
+
+    # FIXME D.name, as well as V.end/J.start/D.start/D.end, will not necessarily
+    # match when V, J, CDR3length and CDR3simil85 end up grouped together
+    d3 <- d2 %>%
           summarise(n=n(), Clones=sum(Clones), Proportion=sum(Proportion),
                     CDR3.nt=consensus_nt(CDR3.nt),
                     # CDR3.aa=consensus_aa(CDR3.aa),
                     CDR3.aa=as.character(translate(DNAString(CDR3.nt), if.fuzzy.codon="solve")),
-                    D.name, V.end, D.start, D.end,
-                    J.start, VJ.ins, VD.ins, DJ.ins
+                    D.name=str_c(unique(D.name), collapse=","), V.end=str_c(unique(V.end), collapse=","),
+                    D.start=str_c(unique(D.start), collapse=","), D.end=str_c(unique(D.end), collapse=","),
+                    J.start=str_c(unique(J.start), collapse=","),
+                    VJ.ins=str_c(unique(VJ.ins), collapse=","), VD.ins=str_c(unique(VD.ins), collapse=","), DJ.ins=str_c(unique(DJ.ins), collapse=","),
+                    Sequence=str_c(unique(Sequence), collapse=",")
                     ) %>%
-          slice_head() %>%
-          ungroup() %>%
+          # slice_head() %>%
+          # ungroup() %>%
           arrange(desc(Clones))
 
-    immdata$data[[name]] <- d2
+    immdata$data[[name]] <- d3
   }
 
   if (overwrite) {
@@ -154,9 +164,12 @@ clones2groups <- function(immdata = NULL, overwrite = F) {
       d <- d %>%
            ungroup() %>%
            select(cloneCount = Clones, nSeqCDR3 = CDR3.nt, aaSeqCDR3 = CDR3.aa,
-                  bestVHit = V.name, bestJHit = J.name, bestDHit = D.name, n,
-                  len, cloneFraction = Proportion) %>%
+                  bestVHit = V.name, bestJHit = J.name,
+                  bestDHit = D.name,
+                  n, len, cloneFraction = Proportion) %>%
            as.data.frame()
+
+      d$bestDHit = NA # removing D because of multiple hits
 
       write.table(d, file=paste0(tolower(name), "_clones.csv"), quote=F, row.names=F, sep="\t")
       # write.table(d, file=paste0("full/", name, ".csv"), quote=F, row.names=F, sep="\t")
