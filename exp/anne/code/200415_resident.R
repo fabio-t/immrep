@@ -12,8 +12,8 @@ mid_labels <- read.csv("mid_labels.csv", row.names=1)
 print(mid_labels)
 mid_names <- mid_labels[colnames(mids_counts), "label", drop=T]
 
-overview()
-make_rarefaction_plots(mids_counts, rarefy=T)
+overview(exclude=c("MID50", "MID48", "MID46"))
+# make_rarefaction_plots(mids_counts, rarefy=T)
 make_diversity(mids_counts, mid_names)
 
 ## heatmaps

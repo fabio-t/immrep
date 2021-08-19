@@ -31,7 +31,7 @@ echo "MIDS: $MIDS"
 
 echo "demultiplexing io.."
 
-p=2
+p=3
 #chimeric="--allow-chimeric"
 #segments="--all-segments"
 cf="--filter-collisions"
