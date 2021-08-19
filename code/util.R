@@ -184,29 +184,89 @@ overview <- function(dirname = "overview", immdata = NULL) {
     immdata <- immload()
   }
 
+  # downsamples to smallest clonality (NOT clonotypes)
+  immdata2 <- immdata
+  immdata2$data <- repSample(immdata$data, .method="downsample")
+
   dirname <- make_path(dirname)
   print(dirname)
 
-  t1 <- repExplore(immdata$data, .method = "volume")
-  t2 <- repExplore(immdata$data, .method = "count")
-  vis(t1) + vis(t2) + theme_minimal(base_size=12) + theme(axis.text.x = element_text(angle = 90))
+ # + theme_minimal(base_size=12) + theme(axis.text.x = element_text(angle = 90))
+
+  t1 <-  repExplore(immdata$data,  .method = "volume")
+  t1b <- repExplore(immdata2$data, .method = "volume")
+  t2 <-  repExplore(immdata$data,  .method = "count")
+  t2b <- repExplore(immdata2$data, .method = "count")
+  p1 <-  vis(t1)
+  p1b <- vis(t1b)
+  p2 <-  vis(t2)
+  p2b <- vis(t2b)
+  p1 + p2 + p1b + p2b
   ggsave(filename = paste0(dirname, "basic.pdf"), width = 16, height = (9/16) * 16)
 
-  # div_hill <- repDiversity(immdata$data, "hill", .col="nt+v+j")
-  # p1 <- vis(div_hill, .meta = immdata$meta)
-  # p2 <- vis(div_hill, .by = c("Mouse"), .meta = immdata$meta)
-  # p3 <- vis(div_hill, .by = c("Organ"), .meta = immdata$meta)
-  # p4 <- vis(div_hill, .by = c("Mouse", "Organ"), .meta = immdata$meta)
-  # p1+p2+p3+p4
-  # ggsave("hill.pdf")
-  # imm_raref <- repDiversity(immdata$data, "raref", .verbose = F, .col = "nt+v+j")
-  # p1 <- vis(imm_raref, .meta = immdata$meta)
-  # p2 <- vis(imm_raref, .by = c("Mouse"), .meta = immdata$meta)
-  # p3 <- vis(imm_raref, .by = c("Organ"), .meta = immdata$meta)
-  # p4 <- vis(imm_raref, .by = c("Mouse", "Organ"), .meta = immdata$meta)
-  # p1+p2+p3+p4
-  # ggsave("raref.pdf")
+  # hill curves
+  hill_1 <- repDiversity(immdata$data,  "hill", .col="nt+v+j")
+  hill_2 <- repDiversity(immdata2$data, "hill", .col="nt+v+j")
+  p1 <- vis(hill_1, .meta = immdata$meta)
+  p2 <- vis(hill_2, .meta = immdata2$meta)
+  p1 + p2
+  ggsave(filename = paste0(dirname, "hill.pdf"), width = 16, height = (9/16) * 16)
 
+  # # true diversity
+  # div_1 <- repDiversity(immdata$data,  "div", .col="nt+v+j")
+  # div_2 <- repDiversity(immdata2$data, "div", .col="nt+v+j")
+  # p1 <- vis(div_1, .meta = immdata$meta)
+  # p2 <- vis(div_2, .meta = immdata2$meta)
+  # p1 + p2
+  # ggsave(filename = paste0(dirname, "truediv.pdf"), width = 16, height = (9/16) * 16)
+
+  # # gini-simpson index
+  # ginisimp_1 <- repDiversity(immdata$data,  "gini.simp", .col="nt+v+j")
+  # ginisimp_2 <- repDiversity(immdata2$data, "gini.simp", .col="nt+v+j")
+  # p1 <- vis(ginisimp_1, .meta = immdata$meta)
+  # p2 <- vis(ginisimp_2, .meta = immdata2$meta)
+  # p1 + p2
+  # ggsave(filename = paste0(dirname, "ginisimpson.pdf"), width = 16, height = (9/16) * 16)
+
+  # inverse-simpson index
+  invsimp_1 <- repDiversity(immdata$data,  "inv.simp", .col="nt+v+j")
+  invsimp_2 <- repDiversity(immdata2$data, "inv.simp", .col="nt+v+j")
+  p1 <- vis(invsimp_1, .meta = immdata$meta)
+  p2 <- vis(invsimp_2, .meta = immdata2$meta)
+  p1 + p2
+  ggsave(filename = paste0(dirname, "invsimpson.pdf"), width = 16, height = (9/16) * 16)
+
+  # number of clonotypes summing up to 50% abundance
+  d50_1 <- repDiversity(immdata$data,  "d50", .col="nt+v+j")
+  d50_2 <- repDiversity(immdata2$data, "d50", .col="nt+v+j")
+  p1 <- vis(d50_1, .meta = immdata$meta)
+  p2 <- vis(d50_2, .meta = immdata2$meta)
+  p1 + p2
+  ggsave(filename = paste0(dirname, "d50.pdf"), width = 16, height = (9/16) * 16)
+
+  # rarefaction
+  raref_1 <- repDiversity(immdata$data,  "raref", .verbose = F, .norm=F, .col = "nt+v+j")
+  raref_2 <- repDiversity(immdata2$data, "raref", .verbose = F, .norm=F, .col = "nt+v+j")
+  p1 <-  vis(raref_1, .meta = immdata$meta)
+  p1b <- vis(raref_1, .meta = immdata$meta, .log=T)
+  p2 <-  vis(raref_2, .meta = immdata2$meta)
+  p2b <- vis(raref_2, .meta = immdata2$meta, .log=T)
+  p1 + p2
+  ggsave(filename = paste0(dirname, "raref.pdf"), width = 16, height = (9/16) * 16)
+  p1b + p2b
+  ggsave(filename = paste0(dirname, "raref-log.pdf"), width = 16, height = (9/16) * 16)
+
+  # rarefaction (normalised)
+  raref_1 <- repDiversity(immdata$data,  "raref", .verbose = F, .norm=T, .col = "nt+v+j")
+  raref_2 <- repDiversity(immdata2$data, "raref", .verbose = F, .norm=T, .col = "nt+v+j")
+  p1 <-  vis(raref_1, .meta = immdata$meta)
+  p1b <- vis(raref_1, .meta = immdata$meta, .log=T)
+  p2 <-  vis(raref_2, .meta = immdata2$meta)
+  p2b <- vis(raref_2, .meta = immdata2$meta, .log=T)
+  p1 + p2
+  ggsave(filename = paste0(dirname, "raref-norm.pdf"), width = 16, height = (9/16) * 16)
+  p1b + p2b
+  ggsave(filename = paste0(dirname, "raref-log-norm.pdf"), width = 16, height = (9/16) * 16)
 }
 
 track_clones <- function(regexp, dirname, invert = F, n = 15, immdata = NULL) {

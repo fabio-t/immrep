@@ -48,11 +48,11 @@ jointype="raw" # because it's clonal trees, we already strip alleles
 # exp_data_dir="210426_diversity_dual_indices"
 # ql=15
 
-m="b"
-indices=`echo {30..44}`
-exp_dir="200709_comparison"
-exp_data_dir="200709_comparison_IgA_liver_gut"
-ql=15
+# m="b"
+# indices=`echo {30..44}`
+# exp_dir="200709_comparison"
+# exp_data_dir="200709_comparison_IgA_liver_gut"
+# ql=15
 
 # m="b"
 # indices=`echo {1..15}`
