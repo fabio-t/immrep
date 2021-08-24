@@ -114,7 +114,7 @@ immload <- function(which="full") {
   }
 
   meta <- cbind(Sample=rownames(mid_labels), mid_labels)
-  immdata$meta <- as_tibble(mid_labels)
+  immdata$meta <- as_tibble(meta)
 
   return(immdata)
 }
@@ -179,7 +179,7 @@ clones2groups <- function(immdata = NULL, overwrite = F, savefasta = F) {
   return(immdata)
 }
 
-overview <- function(dirname = "overview", immdata = NULL) {
+overview <- function(dirname = "overview", immdata = NULL, exclude = NULL) {
   if (is.null(immdata)) {
     immdata <- immload()
   }
@@ -187,6 +187,17 @@ overview <- function(dirname = "overview", immdata = NULL) {
   # downsamples to smallest clonality (NOT clonotypes)
   immdata2 <- immdata
   immdata2$data <- repSample(immdata$data, .method="downsample")
+  n_clntps <- min(sapply(immdata2$data, nrow))
+  n_clones <- min(sapply(immdata2$data, function(x){sum(x$Clones)}))
+
+  print(n_clntps)
+  print(n_clones)
+
+  if (n_clones < 10) {
+    raref_step <- 1
+  } else {
+    raref_step <- NA
+  }
 
   dirname <- make_path(dirname)
   print(dirname)
@@ -245,8 +256,8 @@ overview <- function(dirname = "overview", immdata = NULL) {
   ggsave(filename = paste0(dirname, "d50.pdf"), width = 16, height = (9/16) * 16)
 
   # rarefaction
-  raref_1 <- repDiversity(immdata$data,  "raref", .verbose = F, .norm=F, .col = "nt+v+j")
-  raref_2 <- repDiversity(immdata2$data, "raref", .verbose = F, .norm=F, .col = "nt+v+j")
+  raref_1 <- repDiversity(immdata$data,  "raref", .verbose = F, .norm=F, .col = "nt+v+j", .step = raref_step)
+  raref_2 <- repDiversity(immdata2$data, "raref", .verbose = F, .norm=F, .col = "nt+v+j", .step = raref_step)
   p1 <-  vis(raref_1, .meta = immdata$meta)
   p1b <- vis(raref_1, .meta = immdata$meta, .log=T)
   p2 <-  vis(raref_2, .meta = immdata2$meta)
@@ -257,8 +268,8 @@ overview <- function(dirname = "overview", immdata = NULL) {
   ggsave(filename = paste0(dirname, "raref-log.pdf"), width = 16, height = (9/16) * 16)
 
   # rarefaction (normalised)
-  raref_1 <- repDiversity(immdata$data,  "raref", .verbose = F, .norm=T, .col = "nt+v+j")
-  raref_2 <- repDiversity(immdata2$data, "raref", .verbose = F, .norm=T, .col = "nt+v+j")
+  raref_1 <- repDiversity(immdata$data,  "raref", .verbose = F, .norm=T, .col = "nt+v+j", .step = raref_step)
+  raref_2 <- repDiversity(immdata2$data, "raref", .verbose = F, .norm=T, .col = "nt+v+j", .step = raref_step)
   p1 <-  vis(raref_1, .meta = immdata$meta)
   p1b <- vis(raref_1, .meta = immdata$meta, .log=T)
   p2 <-  vis(raref_2, .meta = immdata2$meta)

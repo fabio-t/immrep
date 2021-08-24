@@ -5,14 +5,15 @@ root <- is_vcs_root$make_fix_file()
 
 source(root("code/util.R"))
 
-# calculate frequencies from counts
-mids_counts = read.csv("mids_counts.csv", sep="\t", row.names = 1)
-
 mid_labels <- read.csv("mid_labels.csv", row.names=1)
 print(mid_labels)
+
+idata <- immload(which="full")
+
+mids_counts = read.csv("mids_counts.csv", sep="\t", row.names = 1)
 mid_names <- mid_labels[colnames(mids_counts), "label", drop=T]
 
-overview()
+overview(immdata=idata)
 # make_rarefaction_plots(mids_counts, rarefy=T)
 make_diversity(mids_counts, mid_names)
 
@@ -64,4 +65,4 @@ for (tp in c(1, 0.85)) {
     radarcharts("O", "M12345_O")
 }
 
-track_clones(NULL, NULL)
+track_clones(NULL, NULL, immdata=idata)
