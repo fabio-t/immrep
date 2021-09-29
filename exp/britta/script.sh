@@ -74,12 +74,12 @@ jointype="raw" # because it's clonal trees, we already strip alleles
 # exp_data_dir="201215_sc_SPFvsMM12"
 # ql=15
 
-# m="b"
-# indices=`echo {16..24}`
-# execscript="201215_sc_SPFvsMM12"
-# exp_dir="201215_sc_SPFvsMM12_short"
-# exp_data_dir="201215_sc_SPFvsMM12_short"
-# ql=20
+m="b"
+indices=`echo {16..24}`
+execscript="201215_sc_SPFvsMM12"
+exp_dir="201215_sc_SPFvsMM12_short"
+exp_data_dir="201215_sc_SPFvsMM12_short"
+ql=20
 
 # load and run script
 source ../../code/script.sh

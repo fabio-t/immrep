@@ -87,8 +87,21 @@ radarcharts <- function(regexp, dirname, save = F, invert = F, colours = NULL) {
   }
 }
 
+# from https://bootstrappers.umassmed.edu/guides/main/r_writeFasta.html
+write.fasta <- function(data, filename){
+  fastaLines = c()
+  for (rowNum in 1:nrow(data)){
+    fastaLines = c(fastaLines, as.character(paste(">", data[rowNum,"name"], sep = "")))
+    fastaLines = c(fastaLines,as.character(data[rowNum,"seq"]))
+  }
+  fileConn<-file(filename)
+  writeLines(fastaLines, fileConn)
+  close(fileConn)
+}
+
 consensus_nt <- function(x){consensusString(DNAStringSet(x))}
 consensus_aa <- function(x){consensusString(AAStringSet(x))}
+transl_nt2aa <- function(x){as.character(translate(DNAString(x), if.fuzzy.codon="solve"))}
 
 # by default, two clones are split if they have < 85% similarity
 cloneclust <- function(x, h=0.15) {
@@ -135,20 +148,74 @@ clones2groups <- function(immdata = NULL, overwrite = F, savefasta = F) {
     d2 <- d %>%
           mutate(len=str_length(CDR3.nt)) %>%
           group_by(V.name, J.name, len) %>%
-          mutate(id=str_c(cur_group_id(), cloneclust(CDR3.aa, 0.2), sep=".")) %>%
+          mutate(id=str_c(cur_group_id(), cloneclust(CDR3.aa, 0.15), sep=".")) %>%
           group_by(id, .add=T)
+    print(d2)
+
+    if (savefasta) {
+      ## (careful with cumsum, because of how clones are grouped)
+
+      ## keep only the top groups
+      d3 <- d2 %>% mutate(n=n()) %>% ungroup() %>% mutate(gn = dense_rank(dplyr::desc(n))) %>% filter(gn %in% 1:20)
+      ## keeps only subclones whose abundance is at least 5% of the whole
+      ## lineage (it keeps all lineages but prunes them)
+      # d3 <- d2 %>% filter(Clones/sum(Clones) >= 0.05)
+      ## keeps only subclones that sumup to 50% total abundance
+      ## (drops most singleton subclones and many lineages, but it may be too harsh,
+      ## and still let many singleton LINEAGES in the final set)
+      # d3 <- d2 %>% ungroup() %>% arrange(desc(Clones)) %>% filter(cumsum(Proportion) <= 0.75)
+      ## keeps only lineages that sumup to 50% total abundance
+      ## (will potentially keep enormous trees full of singletons..
+      ## but we can farther filter out later)
+      ### TBD
+
+      print(d3)
+      for (clone_id in unique(d3$id)) {
+        print(clone_id)
+        d4 <- d3 %>%
+              ungroup() %>%
+              filter(id == clone_id) %>%
+              arrange(desc(Clones)) %>%
+              slice_head(n=50) # keep from having too-large trees
+        if (nrow(d4) < 2) next # drop empty clones, but also singletons
+        print(d4)
+        seqid <- paste(d4$CDR3.nt, d4$CDR3.aa, d4$Clones, sep="|")
+        seq <- substr(d4$Sequence, 1, ceiling(d4$V.end/3)*3) # need a multiple of 3
+        # seq <- substr(d4$Sequence, 1, ceiling(d4$J.start/3)*3-3) # need a multiple of 3
+        fasta_df <- data.frame(name=seqid, seq=seq)
+        dirname = make_path(paste0("fasta/", name))
+        print(dirname)
+        filename = paste0(dirname, d4$V.name[1], "_", d4$J.name[1], "_", d4$len[1], "_", d4$id[1], ".fasta")
+        print(filename)
+        write.fasta(fasta_df, filename)
+      }
+    }
 
     # FIXME D.name, as well as V.end/J.start/D.start/D.end, will not necessarily
-    # match when V, J, CDR3length and CDR3simil85 end up grouped together
+    # match when V, J, CDR3length and CDR3@85% end up grouped together
     d3 <- d2 %>%
-          summarise(n=n(), Clones=sum(Clones), Proportion=sum(Proportion),
+          summarise(cloneId=str_c(unique(id)), n=n(),
+                    Clones=sum(Clones), Proportion=sum(Proportion),
                     CDR3.nt=consensus_nt(CDR3.nt),
                     # CDR3.aa=consensus_aa(CDR3.aa),
-                    CDR3.aa=as.character(translate(DNAString(CDR3.nt), if.fuzzy.codon="solve")),
-                    D.name=str_c(unique(D.name), collapse=","), V.end=str_c(unique(V.end), collapse=","),
-                    D.start=str_c(unique(D.start), collapse=","), D.end=str_c(unique(D.end), collapse=","),
+                    CDR3.aa=transl_nt2aa(CDR3.nt),
+
+                    # some extra stuff to caracterise the lineages
+                    # expsha=exp(diversity(Clones, index="shannon")),
+                    diversity=diversity(Clones, index="invsim"),
+                    # shan_even=diversity(Clones, index="shannon")/log(n()),
+                    # shan_even2=exp(diversity(Clones, index="shannon"))/n(),
+                    evenness=diversity(Clones, index="invsim")/n(),
+
+                    # stuff for immunarch
+                    D.name=str_c(unique(D.name), collapse=","),
+                    V.end=str_c(unique(V.end), collapse=","),
+                    D.start=str_c(unique(D.start), collapse=","),
+                    D.end=str_c(unique(D.end), collapse=","),
                     J.start=str_c(unique(J.start), collapse=","),
-                    VJ.ins=str_c(unique(VJ.ins), collapse=","), VD.ins=str_c(unique(VD.ins), collapse=","), DJ.ins=str_c(unique(DJ.ins), collapse=","),
+                    VJ.ins=str_c(unique(VJ.ins), collapse=","),
+                    VD.ins=str_c(unique(VD.ins), collapse=","),
+                    DJ.ins=str_c(unique(DJ.ins), collapse=","),
                     Sequence=str_c(unique(Sequence), collapse=",")
                     ) %>%
           # slice_head() %>%
@@ -162,11 +229,17 @@ clones2groups <- function(immdata = NULL, overwrite = F, savefasta = F) {
     for (name in names(immdata$data)) {
       d <- immdata$data[[name]]
       d <- d %>%
-           ungroup() %>%
-           select(cloneCount = Clones, nSeqCDR3 = CDR3.nt, aaSeqCDR3 = CDR3.aa,
+           # ungroup() %>%
+           select(cloneCount = Clones,
+                  nSeqCDR3 = CDR3.nt, aaSeqCDR3 = CDR3.aa,
                   bestVHit = V.name, bestJHit = J.name,
                   bestDHit = D.name,
-                  n, len, cloneFraction = Proportion) %>%
+                  CDR3Length = len,
+                  cloneSize = n,
+                  cloneDiversity = diversity,
+                  cloneEvenness = evenness,
+                  cloneId,
+                  cloneFraction = Proportion) %>%
            as.data.frame()
 
       d$bestDHit = NA # removing D because of multiple hits
