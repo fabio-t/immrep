@@ -9,16 +9,24 @@ from argparse import ArgumentParser
 parser = ArgumentParser()
 
 # data input
-parser.add_argument("--unique", action="store_true", default=False, help="Don't use only the CDR3 region as key, but add V and J best hits")
-parser.add_argument("--exclude-j", action="store_true", default=False, help="If --unique is set, we may want to only use the V+CDR3 as key")
-parser.add_argument("--cdr3nt-only", action="store_true", default=False, help="If --unique is set, we may want to only use the CDR3 (nucleotides) as key")
-parser.add_argument("--cdr3aa-only", action="store_true", default=False, help="If --unique is set, we may want to only use the CDR3 (aminoacids) as key")
-parser.add_argument("--type", type=str, default='raw', choices=['raw', 'gene', 'family'])
-parser.add_argument("indices", type=int, nargs="+", help="the list of MIDs to use")
+parser.add_argument("--unique", action="store_true", default=False,
+                    help="Don't use only the CDR3 region as key, but add V and J best hits")
+parser.add_argument("--exclude-j", action="store_true", default=False,
+                    help="If --unique is set, we may want to only use the V+CDR3 as key")
+parser.add_argument("--cdr3nt-only", action="store_true", default=False,
+                    help="If --unique is set, we may want to only use the CDR3 (nucleotides) as key")
+parser.add_argument("--cdr3aa-only", action="store_true", default=False,
+                    help="If --unique is set, we may want to only use the CDR3 (aminoacids) as key")
+parser.add_argument("--type", type=str, default='raw',
+                    choices=['raw', 'gene', 'family'])
+parser.add_argument("indices", type=int, nargs="+",
+                    help="the list of MIDs to use")
 
 args = parser.parse_args()
 
 # FIXME it doesn't account for a LIST of hits
+
+
 def tname(s, t):
     if t == 'gene':
         s = re.sub('\*[0-9]+$', '', s)
@@ -28,6 +36,7 @@ def tname(s, t):
         return s
     else:
         return s
+
 
 d = {}
 
@@ -64,7 +73,8 @@ for i in range(len(args.indices)):
                 key = seq
             else:
                 j_hit = fields[4].split(",")[0].strip()
-                key = "%s_%s_%s" % (seq, tname(v_hit, args.type), tname(j_hit, args.type))
+                key = "%s_%s_%s" % (seq, tname(
+                    v_hit, args.type), tname(j_hit, args.type))
         else:
             key = seq
 

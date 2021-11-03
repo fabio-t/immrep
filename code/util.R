@@ -132,7 +132,7 @@ immload <- function(which="full") {
   return(immdata)
 }
 
-clones2groups <- function(immdata = NULL, overwrite = F, savefasta = F) {
+clones2groups <- function(immdata = NULL, overwrite = F, savefasta = F, join_by=NULL, collapse=F, downsample=F) {
   if (is.null(immdata)) {
     immdata <- immload()
   }
@@ -142,14 +142,39 @@ clones2groups <- function(immdata = NULL, overwrite = F, savefasta = F) {
   library(Biostrings)
   library(ape)
 
-  for (name in names(immdata$data)) {
-    d <- immdata$data[[name]]
+  if (downsample) {
+    immdata$data <- repSample(immdata$data, .method="downsample")
+  }
+
+  immdata$data <- Map(function(x,y){tibble::add_column(x, Sample=y, .before=1)}, immdata$data, immdata$meta$Sample)
+  if (!is.null(join_by)) {
+    immdata$data <- Map(function(x,y){tibble::add_column(x, JoinBy=y, .before=2)}, immdata$data, immdata$meta[, join_by, drop=T])
+  } else {
+    immdata$data <- Map(function(x,y){tibble::add_column(x, JoinBy=y, .before=2)}, immdata$data, immdata$meta$Sample)
+  }
+  all_d <- tibble(join_all(immdata$data, type="full"))
+  all_d$JoinBy <- factor(all_d$JoinBy)
+  all_d$Sample <- factor(all_d$Sample, levels=names(immdata$data))
+  all_d2 <- all_d %>%
+        arrange(JoinBy, desc(Clones)) %>%
+        mutate(len=str_length(CDR3.nt)) %>%
+        group_by(V.name, J.name, len, JoinBy) %>%
+        mutate(id=str_c(cur_group_id(), cloneclust(CDR3.aa, 0.15), sep=".")) %>%
+        group_by(id, .add=T)
+  print(all_d2, width=Inf)
+  if (collapse) {
+    all_d3 <- all_d2 %>% ungroup() %>% group_split(JoinBy, .keep=F)
+    names(all_d3) <- levels(all_d$JoinBy)
+  } else {
+    all_d3 <- all_d2 %>% ungroup() %>% select(-JoinBy) %>% group_split(Sample, .keep=T)
+    names(all_d3) <- names(immdata$data)
+  }
+
+  for (name in names(all_d3)) {
+    d <- all_d3[[name]]
 
     d2 <- d %>%
-          mutate(len=str_length(CDR3.nt)) %>%
-          group_by(V.name, J.name, len) %>%
-          mutate(id=str_c(cur_group_id(), cloneclust(CDR3.aa, 0.15), sep=".")) %>%
-          group_by(id, .add=T)
+          group_by(V.name, J.name, len, id)
     print(d2)
 
     if (savefasta) {
@@ -179,7 +204,7 @@ clones2groups <- function(immdata = NULL, overwrite = F, savefasta = F) {
               slice_head(n=50) # keep from having too-large trees
         if (nrow(d4) < 2) next # drop empty clones, but also singletons
         print(d4)
-        seqid <- paste(d4$CDR3.nt, d4$CDR3.aa, d4$Clones, sep="|")
+        seqid <- paste(d4$Sample, d4$CDR3.nt, d4$CDR3.aa, d4$Clones, sep="|")
         seq <- substr(d4$Sequence, 1, ceiling(d4$V.end/3)*3) # need a multiple of 3
         # seq <- substr(d4$Sequence, 1, ceiling(d4$J.start/3)*3-3) # need a multiple of 3
         fasta_df <- data.frame(name=seqid, seq=seq)
@@ -194,18 +219,18 @@ clones2groups <- function(immdata = NULL, overwrite = F, savefasta = F) {
     # FIXME D.name, as well as V.end/J.start/D.start/D.end, will not necessarily
     # match when V, J, CDR3length and CDR3@85% end up grouped together
     d3 <- d2 %>%
-          summarise(cloneId=str_c(unique(id)), n=n(),
-                    Clones=sum(Clones), Proportion=sum(Proportion),
-                    CDR3.nt=consensus_nt(CDR3.nt),
+          summarise(cloneId=str_c(unique(id)), cloneSize=n(),
+                    cloneCount=sum(Clones), cloneFraction=sum(Proportion),
+                    nSeqCDR3=consensus_nt(CDR3.nt),
                     # CDR3.aa=consensus_aa(CDR3.aa),
-                    CDR3.aa=transl_nt2aa(CDR3.nt),
+                    aaSeqCDR3=transl_nt2aa(nSeqCDR3),
 
                     # some extra stuff to caracterise the lineages
                     # expsha=exp(diversity(Clones, index="shannon")),
-                    diversity=diversity(Clones, index="invsim"),
+                    cloneDiversity=diversity(Clones, index="invsim"),
                     # shan_even=diversity(Clones, index="shannon")/log(n()),
                     # shan_even2=exp(diversity(Clones, index="shannon"))/n(),
-                    evenness=diversity(Clones, index="invsim")/n(),
+                    cloneEvenness=diversity(Clones, index="invsim")/n(),
 
                     # stuff for immunarch
                     D.name=str_c(unique(D.name), collapse=","),
@@ -216,30 +241,36 @@ clones2groups <- function(immdata = NULL, overwrite = F, savefasta = F) {
                     VJ.ins=str_c(unique(VJ.ins), collapse=","),
                     VD.ins=str_c(unique(VD.ins), collapse=","),
                     DJ.ins=str_c(unique(DJ.ins), collapse=","),
-                    Sequence=str_c(unique(Sequence), collapse=",")
+                    Sequence=str_c(unique(Sequence), collapse=","),
+                    Samples=str_c(unique(Sample), collapse=",")
                     ) %>%
           # slice_head() %>%
           # ungroup() %>%
-          arrange(desc(Clones))
+          arrange(desc(cloneCount))
 
-    immdata$data[[name]] <- d3
+    print(d3, width=Inf)
+
+    immdata$data[[name]] = d3
   }
 
   if (overwrite) {
-    for (name in names(immdata$data)) {
+    print("OVERWRITING CLONES FILES..")
+    for (name in names(all_d3)) {
       d <- immdata$data[[name]]
       d <- d %>%
            # ungroup() %>%
-           select(cloneCount = Clones,
-                  nSeqCDR3 = CDR3.nt, aaSeqCDR3 = CDR3.aa,
-                  bestVHit = V.name, bestJHit = J.name,
+           select(cloneCount,
+                  nSeqCDR3, aaSeqCDR3,
+                  bestVHit = V.name,
+                  bestJHit = J.name,
                   bestDHit = D.name,
                   CDR3Length = len,
-                  cloneSize = n,
-                  cloneDiversity = diversity,
-                  cloneEvenness = evenness,
+                  cloneSize,
+                  cloneDiversity,
+                  cloneEvenness,
                   cloneId,
-                  cloneFraction = Proportion) %>%
+                  Samples,
+                  cloneFraction) %>%
            as.data.frame()
 
       d$bestDHit = NA # removing D because of multiple hits
@@ -251,6 +282,9 @@ clones2groups <- function(immdata = NULL, overwrite = F, savefasta = F) {
 
   return(immdata)
 }
+
+# TODO: plot clonal trees, not through gctree because we need them plotted as
+# "forests" (eg, nodes will need to be sized consistently across all samples)
 
 overview <- function(dirname = "overview", immdata = NULL, exclude = NULL) {
   if (is.null(immdata)) {
