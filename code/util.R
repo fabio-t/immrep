@@ -116,7 +116,7 @@ cloneclust <- function(x, h=0.15) {
   cutree(cl, h=h)
 }
 
-immload <- function(which="full") {
+immload <- function(which="full", downsample=F) {
   library(immunarch)
 
   if (which == "full") {
@@ -126,25 +126,27 @@ immload <- function(which="full") {
     names(immdata$data) <- toupper(gsub("_clones", "", names(immdata$data)))
   }
 
+  if (downsample == T) {
+    immdata$data <- repSample(immdata$data, .method="downsample")
+  } else if (is.numeric(downsample)) {
+    immdata$data <- repSample(immdata$data, .method="downsample", .n=downsample)
+  }
+
   meta <- cbind(Sample=rownames(mid_labels), mid_labels)
   immdata$meta <- as_tibble(meta)
 
   return(immdata)
 }
 
-clones2groups <- function(immdata = NULL, overwrite = F, savefasta = F, join_by=NULL, collapse=F, downsample=F) {
+clones2groups <- function(immdata = NULL, overwrite = F, savefasta = F, dirname="fasta", join_by=NULL, collapse=F, downsample=F) {
   if (is.null(immdata)) {
-    immdata <- immload()
+    immdata <- immload(downsample=downsample)
   }
 
   library(dplyr)
   library(stringr)
   library(Biostrings)
   library(ape)
-
-  if (downsample) {
-    immdata$data <- repSample(immdata$data, .method="downsample")
-  }
 
   immdata$data <- Map(function(x,y){tibble::add_column(x, Sample=y, .before=1)}, immdata$data, immdata$meta$Sample)
   if (!is.null(join_by)) {
@@ -178,10 +180,12 @@ clones2groups <- function(immdata = NULL, overwrite = F, savefasta = F, join_by=
     print(d2)
 
     if (savefasta) {
-      ## (careful with cumsum, because of how clones are grouped)
+      d3 <- d2 # keep in case everything below's commented out
 
+      ### (careful with cumsum, because of how clones are grouped)
       ## keep only the top groups
-      d3 <- d2 %>% mutate(n=n()) %>% ungroup() %>% mutate(gn = dense_rank(dplyr::desc(n))) %>% filter(gn %in% 1:20)
+      # d3 <- d2 %>% mutate(n=n()) %>% ungroup() %>% mutate(gn = dense_rank(dplyr::desc(n))) %>% filter(gn %in% 1:20)
+      # d3 <- d2 %>% mutate(n=n()) %>% ungroup() %>% mutate(gn = dense_rank(dplyr::desc(Clones))) %>% filter(gn %in% 1:20)
       ## keeps only subclones whose abundance is at least 5% of the whole
       ## lineage (it keeps all lineages but prunes them)
       # d3 <- d2 %>% filter(Clones/sum(Clones) >= 0.05)
@@ -200,17 +204,17 @@ clones2groups <- function(immdata = NULL, overwrite = F, savefasta = F, join_by=
         d4 <- d3 %>%
               ungroup() %>%
               filter(id == clone_id) %>%
-              arrange(desc(Clones)) %>%
-              slice_head(n=50) # keep from having too-large trees
+              arrange(desc(Clones))
+              # %>% slice_head(n=50) # keep from having too-large trees
         if (nrow(d4) < 2) next # drop empty clones, but also singletons
         print(d4)
         seqid <- paste(d4$Sample, d4$CDR3.nt, d4$CDR3.aa, d4$Clones, sep="|")
         seq <- substr(d4$Sequence, 1, ceiling(d4$V.end/3)*3) # need a multiple of 3
         # seq <- substr(d4$Sequence, 1, ceiling(d4$J.start/3)*3-3) # need a multiple of 3
         fasta_df <- data.frame(name=seqid, seq=seq)
-        dirname = make_path(paste0("fasta/", name))
-        print(dirname)
-        filename = paste0(dirname, d4$V.name[1], "_", d4$J.name[1], "_", d4$len[1], "_", d4$id[1], ".fasta")
+        path = make_path(paste0(dirname, "/", name))
+        print(path)
+        filename = paste0(path, d4$V.name[1], "_", d4$J.name[1], "_", d4$len[1], "_", d4$id[1], ".fasta")
         print(filename)
         write.fasta(fasta_df, filename)
       }
@@ -274,6 +278,10 @@ clones2groups <- function(immdata = NULL, overwrite = F, savefasta = F, join_by=
            as.data.frame()
 
       d$bestDHit = NA # removing D because of multiple hits
+
+      if (is.null(join_by)) {
+        d$Samples = NULL
+      }
 
       write.table(d, file=paste0(tolower(name), "_clones.csv"), quote=F, row.names=F, sep="\t")
       # write.table(d, file=paste0("full/", name, ".csv"), quote=F, row.names=F, sep="\t")

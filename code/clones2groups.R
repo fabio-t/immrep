@@ -7,4 +7,5 @@ source(root("code/util.R"))
 mid_labels <- read.csv("mid_labels.csv", row.names=1)
 print(mid_labels)
 
-clones2groups(overwrite=T, savefasta=T, join_by="mouse", collapse=T, downsample=T)
+clones2groups(overwrite=T, savefasta=T, dirname="fasta", downsample=1000)
+clones2groups(overwrite=T, savefasta=T, dirname="fasta_groups", join_by="mouse", collapse=T, downsample=1000)
