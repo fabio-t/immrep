@@ -208,11 +208,21 @@ clones2groups <- function(immdata = NULL, overwrite = F, savefasta = F, dirname=
               # %>% slice_head(n=50) # keep from having too-large trees
         if (nrow(d4) < 2) next # drop empty clones, but also singletons
         print(d4)
-        seqid <- paste(d4$Sample, d4$CDR3.nt, d4$CDR3.aa, d4$Clones, sep="|")
+        # seqid <- paste(d4$Sample, d4$CDR3.nt, d4$CDR3.aa, d4$Clones, sep="|")
+        seqid <- paste0("sample=", d4$Sample, "|", "cdr3nt=", d4$CDR3.nt, "|", "cdr3aa=", d4$CDR3.aa, "|", "abundance=", d4$Clones)
         seq <- substr(d4$Sequence, 1, ceiling(d4$V.end/3)*3) # need a multiple of 3
-        # seq <- substr(d4$Sequence, 1, ceiling(d4$J.start/3)*3-3) # need a multiple of 3
+        # seq2 <- substr(d4$Sequence, d4$J.start, ceiling(d4$V.end/3)*3)
+        # seq3 <- substr(d4$Sequence, 1, ceiling(d4$J.start/3)*3-3) # need a multiple of 3
         fasta_df <- data.frame(name=seqid, seq=seq)
         path = make_path(paste0(dirname, "/", name))
+        print(path)
+        filename = paste0(path, d4$V.name[1], "_", d4$J.name[1], "_", d4$len[1], "_", d4$id[1], ".fasta")
+        print(filename)
+        write.fasta(fasta_df, filename)
+
+        # using full vdj
+        fasta_df <- data.frame(name=seqid, seq=d4$Sequence)
+        path = make_path(paste0(dirname, "/", name, "_full"))
         print(path)
         filename = paste0(path, d4$V.name[1], "_", d4$J.name[1], "_", d4$len[1], "_", d4$id[1], ".fasta")
         print(filename)

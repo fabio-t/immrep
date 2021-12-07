@@ -34,6 +34,8 @@ echo $data_type
 echo $chain
 echo $indices
 echo $jointype
+echo $downsample
+echo $groupby
 
 data_prefix="/mnt/storage/data/local/mol_med/${data_type}/${exp_data_dir}/samples"
 
@@ -65,7 +67,15 @@ cp ${data_prefix}/r{1,2}_stats.csv stats/
 
 if [ $data_type == "bcr" ]
 then
-  Rscript /mnt/storage/data/code/clones2groups.R
+  if [ -n $downsample ]
+  then
+    downsample="-d ${downsample}"
+  fi
+  if [ -n $groupby ]
+  then
+    groupby="-g ${groupby}"
+  fi
+  Rscript /mnt/storage/data/code/clones2groups.R $downsample $groupby
 
   for i in $indices
   do

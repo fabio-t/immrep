@@ -30,11 +30,13 @@ jointype="raw" # because it's clonal trees, we already strip alleles
 # exp_data_dir="200623_IgA-200625-IgG__IBD"
 # ql=mix
 
-# m="b"
-# indices=`echo {1..11} 13`
-# exp_dir="200911_replicates"
-# exp_data_dir="200911_mouse_SI_technical_replicates"
-# ql=20
+m="b"
+indices=`echo {1..11} 13`
+exp_dir="200911_replicates"
+exp_data_dir="200911_mouse_SI_technical_replicates"
+ql=20
+downsample=1000
+groupby="mouse"
 
 # m="b"
 # indices=`echo 43 {45..55} {57..69}`
@@ -74,12 +76,12 @@ jointype="raw" # because it's clonal trees, we already strip alleles
 # exp_data_dir="201215_sc_SPFvsMM12"
 # ql=15
 
-m="b"
-indices=`echo {16..24}`
-execscript="201215_sc_SPFvsMM12"
-exp_dir="201215_sc_SPFvsMM12_short"
-exp_data_dir="201215_sc_SPFvsMM12_short"
-ql=20
+# m="b"
+# indices=`echo {16..24}`
+# execscript="201215_sc_SPFvsMM12"
+# exp_dir="201215_sc_SPFvsMM12_short"
+# exp_data_dir="201215_sc_SPFvsMM12_short"
+# ql=20
 
 # load and run script
 source ../../code/script.sh
