@@ -67,11 +67,11 @@ cp ${data_prefix}/r{1,2}_stats.csv stats/
 
 if [ $data_type == "bcr" ]
 then
-  if [ -n $downsample ]
+  if [ -n "$downsample" ]
   then
     downsample="-d ${downsample}"
   fi
-  if [ -n $groupby ]
+  if [ -n "$groupby" ]
   then
     groupby="-g ${groupby}"
   fi

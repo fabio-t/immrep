@@ -4,7 +4,7 @@ import csv
 import pickle
 import math
 from collections import defaultdict
-from ete3 import Tree, faces, TreeStyle, NodeStyle, TextFace, COLOR_SCHEMES
+from ete3 import Tree, faces, TreeStyle, NodeStyle, TextFace, SequenceFace, COLOR_SCHEMES
 from Bio import AlignIO
 
 # FIXME: figure out some way to make this more generic across multiple
@@ -50,7 +50,7 @@ def layout(n):
         T.rotation = -90
         faces.add_face_to_node(T, n, 0)
     if n.abundance > 1:
-        cols = [colours[int(s[3:])] for s in seqs[n.name]["sample"]]
+        cols = [colours[int(s[3:]) % len(colours)] for s in seqs[n.name]["sample"]]
         values = seqs[n.name]["percents"]
         F = faces.PieChartFace(values, colors=cols,
                                width=size * 2, height=size * 2)
@@ -61,6 +61,34 @@ def layout(n):
         ns["size"] = 0
         n.set_style(ns)
 
+def layout2(n):
+    size = max(1, 10 * math.sqrt(n.abundance))
+    if n.abundance > 0:
+        # don't add a label for internal nodes
+        T = TextFace(n.name)
+        faces.add_face_to_node(T, n, 1, position="branch-right")
+    elif n.is_root():
+        T = TextFace(n.name)
+        T.hz_align = 1
+        T.rotation = -90
+        faces.add_face_to_node(T, n, 0)
+    if n.name in seqs:
+        # add CDR3
+        print(n.name)
+        S = SequenceFace(seqs[n.name]["cdr3aa"][0], 'aa',
+                         codon=seqs[n.name]["cdr3nt"][0])
+        faces.add_face_to_node(S, n, 2, position="aligned")
+    if n.abundance > 1:
+        cols = [colours[int(s[3:]) % len(colours)] for s in seqs[n.name]["sample"]]
+        values = seqs[n.name]["percents"]
+        F = faces.PieChartFace(values, colors=cols,
+                               width=size * 2, height=size * 2)
+        F.border.width = None
+        # F.opacity = 0.6
+        faces.add_face_to_node(F, n, 0, position="branch-right")
+        ns = NodeStyle()
+        ns["size"] = 0
+        n.set_style(ns)
 
 ts = TreeStyle()
 ts.layout_fn = layout
@@ -69,3 +97,18 @@ ts.rotation = 90
 ts.show_leaf_name = False
 # t.show(tree_style=ts)
 t.render("tree.svg", w=1280, tree_style=ts)
+
+for n in t.traverse("postorder"):
+  # remove singleton leaves
+  if n.abundance == 1 and n.is_leaf():
+      n.detach()
+ts = TreeStyle()
+ts.layout_fn = layout2
+ts.mode = "r"
+# ts.rotation = 90
+ts.show_leaf_name = False
+# t.show(tree_style=ts)
+ts.draw_guiding_lines = True
+ts.guiding_lines_type = 2
+ts.guiding_lines_color = "#CCCCCC"
+t.render("tree2.svg", w=1280, tree_style=ts)

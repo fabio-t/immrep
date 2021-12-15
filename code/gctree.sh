@@ -1,36 +1,41 @@
 rm -rf *.aln.* *.root.* gctree_*
 
-for f in *.fasta
+shopt -s extglob
+
+organism=${1:-mouse}
+echo $organism
+
+for f in IGH*@([0-9].fasta);
 do
     echo $f
-    f1=`basename $f .fasta`.root.fasta
+    d=`basename $f .fasta`
+    echo $d
+    f1=${d}.root.fasta
     echo ${f1}
-    f2=`basename $f .fasta`.aln.fasta
-    echo ${f2}
     cp ${f} ${f1}
+
     vname=`echo $f | cut -d_ -f1`
-    vgerm=`sed -n "/${vname}\*01|/,/>/p" ~/data_dir/exp/britta/germline_fasta/mouse.v.ext.fasta | sed '1d; $d'`
+    vgerm=`sed -n "/${vname}\*01|/,/>/p" ~/data_dir/exp/britta/germline_fasta/${organism}.v.ext.fasta | sed '1d; $d'`
     jname=`echo $f | cut -d_ -f2`
-    jgerm=`sed -n "/${jname}\*01|/,/>/p" ~/data_dir/exp/britta/germline_fasta/mouse.j.ext.fasta | sed '1d; $d'`
+    jgerm=`sed -n "/${jname}\*01|/,/>/p" ~/data_dir/exp/britta/germline_fasta/${organism}.j.ext.fasta | sed '1d; $d'`
     cl=`echo $f | cut -d_ -f3`
-    div="3"
+    div="1" # long N sequence seems to help with alignment
     n=`expr $cl / $div`
     nrep=`printf -- 'N%.0s' $(seq 1 ${n})`
     name=`echo ${vname}_${jname} | sed 's/IGH//g'`
     echo -e ">${name:0:10}\n${vgerm}" >> ${f1}
-    echo -e "${nrep}\n${jgerm}" >> ${f1}
-    muscle -in ${f1} -out ${f2}
-done
+    echo -e "${nrep}" >> ${f1}
+    echo -e "${jgerm}" >> ${f1}
 
-for f in *.aln.fasta
-do
-    echo $f
-    f2=${f%%.aln.fasta}
-    echo $f2
-    mkdir -p gctree_${f2}
-    cd gctree_${f2}
-    cat ../${f} | sed 's/>.*|abundance=\([0-9]\+\)/>\1/' > f.fasta
-    cp ../${f} f.orig.fasta
+    f2=${d}.aln.fasta
+    echo ${f2}
+    # muscle -in ${f1} -out ${f2}
+    Rscript ~/data_dir/code/align.R ${f1} ${f2}
+
+    mkdir -p gctree_${d}
+    cd gctree_${d}
+    cp ../${f2} f.orig.fasta
+    cat f.orig.fasta | sed 's/>.*|abundance=\([0-9]\+\)/>\1/' > f.fasta
     name=`echo $f | cut -d_ -f1,2 | sed 's/IGH//g'`
     deduplicate f.fasta --idmapfile idmap.csv --id_abundances --root ${name:0:10} --abundance_file abund.csv --frame 1 > f.phyi
     mkconfig --quick f.phyi dnaml > dnaml.cfg

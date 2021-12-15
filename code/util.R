@@ -150,6 +150,9 @@ clones2groups <- function(immdata = NULL, overwrite = F, savefasta = F, dirname=
 
   immdata$data <- Map(function(x,y){tibble::add_column(x, Sample=y, .before=1)}, immdata$data, immdata$meta$Sample)
   if (!is.null(join_by)) {
+    keep = which(!is.na(immdata$meta[, join_by, drop=T]))
+    immdata$meta = immdata$meta[keep, ]
+    immdata$data = immdata$data[keep]
     immdata$data <- Map(function(x,y){tibble::add_column(x, JoinBy=y, .before=2)}, immdata$data, immdata$meta[, join_by, drop=T])
   } else {
     immdata$data <- Map(function(x,y){tibble::add_column(x, JoinBy=y, .before=2)}, immdata$data, immdata$meta$Sample)
@@ -210,17 +213,19 @@ clones2groups <- function(immdata = NULL, overwrite = F, savefasta = F, dirname=
         print(d4)
         # seqid <- paste(d4$Sample, d4$CDR3.nt, d4$CDR3.aa, d4$Clones, sep="|")
         seqid <- paste0("sample=", d4$Sample, "|", "cdr3nt=", d4$CDR3.nt, "|", "cdr3aa=", d4$CDR3.aa, "|", "abundance=", d4$Clones)
-        seq <- substr(d4$Sequence, 1, ceiling(d4$V.end/3)*3) # need a multiple of 3
+
+        ## only v-region
+        # seq1 <- substr(d4$Sequence, 1, ceiling(d4$V.end/3)*3) # need a multiple of 3
         # seq2 <- substr(d4$Sequence, d4$J.start, ceiling(d4$V.end/3)*3)
         # seq3 <- substr(d4$Sequence, 1, ceiling(d4$J.start/3)*3-3) # need a multiple of 3
-        fasta_df <- data.frame(name=seqid, seq=seq)
-        path = make_path(paste0(dirname, "/", name))
-        print(path)
-        filename = paste0(path, d4$V.name[1], "_", d4$J.name[1], "_", d4$len[1], "_", d4$id[1], ".fasta")
-        print(filename)
-        write.fasta(fasta_df, filename)
+        # fasta_df <- data.frame(name=seqid, seq=seq1)
+        # path = make_path(paste0(dirname, "/", name))
+        # print(path)
+        # filename = paste0(path, d4$V.name[1], "_", d4$J.name[1], "_", d4$len[1], "_", d4$id[1], ".fasta")
+        # print(filename)
+        # write.fasta(fasta_df, filename)
 
-        # using full vdj
+        ## using full vdj
         fasta_df <- data.frame(name=seqid, seq=d4$Sequence)
         path = make_path(paste0(dirname, "/", name, "_full"))
         print(path)

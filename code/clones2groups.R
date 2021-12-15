@@ -21,7 +21,7 @@ print(mid_labels)
 
 if (is.null(opt$downsample)) {
   downsample = F
-} else if (opt$downsample == "True") {
+} else if (opt$downsample == "True" || opt$downsample == "T") {
   downsample = T
 } else {
   downsample = as.integer(opt$downsample)
@@ -30,5 +30,5 @@ if (is.null(opt$downsample)) {
 clones2groups(overwrite=T, savefasta=T, dirname="fasta", downsample=downsample)
 
 if (!is.null(opt$'group-by')) {
-  clones2groups(overwrite=T, savefasta=T, dirname="fasta_groups", join_by=opt$'group_by', collapse=T, downsample=downsample)
+  clones2groups(overwrite=T, savefasta=T, dirname="fasta_groups", join_by=opt$'group-by', collapse=T, downsample=downsample)
 }
