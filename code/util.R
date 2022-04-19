@@ -157,13 +157,16 @@ clones2groups <- function(immdata = NULL, overwrite = F, savefasta = F, dirname=
   } else {
     immdata$data <- Map(function(x,y){tibble::add_column(x, JoinBy=y, .before=2)}, immdata$data, immdata$meta$Sample)
   }
+  ## 12/03/2022 needed because of dev version and added broken fields
+  immdata$data <- lapply(immdata$data, function(y){select(y, -c("C.name","C.start","C.end"))})
   all_d <- tibble(join_all(immdata$data, type="full"))
   all_d$JoinBy <- factor(all_d$JoinBy)
   all_d$Sample <- factor(all_d$Sample, levels=names(immdata$data))
   all_d2 <- all_d %>%
         arrange(JoinBy, desc(Clones)) %>%
         mutate(len=str_length(CDR3.nt)) %>%
-        group_by(V.name, J.name, len, JoinBy) %>%
+        # group_by(V.name, J.name, len, JoinBy) %>%
+        group_by(Best.V, Best.J, len, JoinBy) %>%
         mutate(id=str_c(cur_group_id(), cloneclust(CDR3.aa, 0.15), sep=".")) %>%
         group_by(id, .add=T)
   print(all_d2, width=Inf)
@@ -179,7 +182,7 @@ clones2groups <- function(immdata = NULL, overwrite = F, savefasta = F, dirname=
     d <- all_d3[[name]]
 
     d2 <- d %>%
-          group_by(V.name, J.name, len, id)
+          group_by(Best.V, Best.J, len, id)
     print(d2)
 
     if (savefasta) {
@@ -229,7 +232,7 @@ clones2groups <- function(immdata = NULL, overwrite = F, savefasta = F, dirname=
         fasta_df <- data.frame(name=seqid, seq=d4$Sequence)
         path = make_path(paste0(dirname, "/", name, "_full"))
         print(path)
-        filename = paste0(path, d4$V.name[1], "_", d4$J.name[1], "_", d4$len[1], "_", d4$id[1], ".fasta")
+        filename = paste0(path, d4$Best.V[1], "_", d4$Best.J[1], "_", d4$len[1], "_", d4$id[1], ".fasta")
         print(filename)
         write.fasta(fasta_df, filename)
       }
@@ -274,14 +277,15 @@ clones2groups <- function(immdata = NULL, overwrite = F, savefasta = F, dirname=
 
   if (overwrite) {
     print("OVERWRITING CLONES FILES..")
+    # repSave(immdata, "immdata")
     for (name in names(all_d3)) {
       d <- immdata$data[[name]]
       d <- d %>%
            # ungroup() %>%
            select(cloneCount,
                   nSeqCDR3, aaSeqCDR3,
-                  bestVHit = V.name,
-                  bestJHit = J.name,
+                  bestVHit = Best.V,
+                  bestJHit = Best.J,
                   bestDHit = D.name,
                   CDR3Length = len,
                   cloneSize,

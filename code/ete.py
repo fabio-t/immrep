@@ -6,6 +6,7 @@ import math
 from collections import defaultdict
 from ete3 import Tree, faces, TreeStyle, NodeStyle, TextFace, SequenceFace, COLOR_SCHEMES
 from Bio import AlignIO
+import pandas as pd
 
 # FIXME: figure out some way to make this more generic across multiple
 # experiments; for now it just uses the MID number as colour position,
@@ -29,7 +30,12 @@ with open("idmap.csv", newline="") as f:
                         v = int(v)
                     seqs[seq_id][k].append(v)
             tot = sum(seqs[seq_id]["abundance"])
+            seqs[seq_id]["tot_abundance"] = [tot]
             seqs[seq_id]["percents"] = [100*i/tot for i in seqs[seq_id]["abundance"]]
+
+tmp = pd.DataFrame.from_dict(seqs, orient="index")
+tmp2 = tmp.applymap(lambda x: ",".join(map(str,x)))
+tmp2.to_csv("tree.csv", index_label="node", sep="\t")
 
 f = "gctree.out.inference.1.p"
 
@@ -74,9 +80,8 @@ def layout2(n):
         faces.add_face_to_node(T, n, 0)
     if n.name in seqs:
         # add CDR3
-        print(n.name)
-        S = SequenceFace(seqs[n.name]["cdr3aa"][0], 'aa',
-                         codon=seqs[n.name]["cdr3nt"][0])
+        # print(n.name)
+        S = SequenceFace(seqs[n.name]["cdr3nt"][0], 'nt') #codon=seqs[n.name]["cdr3nt"][0])
         faces.add_face_to_node(S, n, 2, position="aligned")
     if n.abundance > 1:
         cols = [colours[int(s[3:]) % len(colours)] for s in seqs[n.name]["sample"]]
@@ -99,8 +104,8 @@ ts.show_leaf_name = False
 t.render("tree.svg", w=1280, tree_style=ts)
 
 for n in t.traverse("postorder"):
-  # remove singleton leaves
-  if n.abundance == 1 and n.is_leaf():
+  # remove singleton leaves (and orphaned ancestral nodes)
+  if n.abundance < 2 and n.is_leaf():
       n.detach()
 ts = TreeStyle()
 ts.layout_fn = layout2

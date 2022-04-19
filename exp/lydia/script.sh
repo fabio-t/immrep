@@ -1,9 +1,14 @@
 #!/bin/bash
 
-migec="migec"
 data_type="tcr"
-safe="_safe"
+chain="TRA" # some experiments might require something different
+resdir="umis"
+bc="_safe_long"
 R="R12"
+tool="mixcr"
+
+# migec="migec"
+# safe="_safe"
 
 # indices=`echo {1..11} {13..17} {19..21}`
 # exp_dir="170714_cultures"
@@ -147,6 +152,20 @@ R="R12"
 # exp_dir="200908_itregtc_2"
 # exp_data_dir="200908_itregtc"
 # migec="migec2"
+
+### new pipeline moving forward
+
+# indices=`echo {20..36}`
+# exp_dir="211203_itregtc3"
+# exp_data_dir="220330_itregtc3_klrg1"
+# m="3"
+# ql="20"
+
+indices=`echo {37..48}`
+exp_dir="211203_klrg1"
+exp_data_dir="220330_itregtc3_klrg1"
+m="1"
+ql="30"
 
 # load and run script
 source ../../code/script.sh
