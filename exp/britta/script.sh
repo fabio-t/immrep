@@ -92,7 +92,15 @@ exp_dir="220408_colonised"
 exp_data_dir="220408_colonised"
 indices=`echo {20..39}`
 m="b"
-ql="20"
+ql="15"
+downsample="T"
+groupby="colonisation,name"
+
+exp_dir="220516_colonised"
+exp_data_dir="220516_colonised"
+indices=`echo {20..39}`
+m="b"
+ql="25"
 downsample="T"
 groupby="colonisation,name"
 

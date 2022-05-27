@@ -34,7 +34,7 @@ echo "demultiplexing io.."
 p=3
 #chimeric="--allow-chimeric"
 #segments="--all-segments"
-cf="--filter-collisions"
+cf="--filter-collisions --collision-ratio 0.001"
 cf2=".cf"
 #germline="--impute-germline-on-export"
 #contig="--contig-assembly"

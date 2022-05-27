@@ -164,8 +164,20 @@ tool="mixcr"
 indices=`echo {37..48}`
 exp_dir="211203_klrg1"
 exp_data_dir="220330_itregtc3_klrg1"
-m="1"
-ql="30"
+m="3"
+ql="20"
+
+# indices=`echo {1..11} 13`
+# exp_dir="220425_klrg1"
+# exp_data_dir="220425_klrg1_cd4cre"
+# m="3"
+# ql="30"
+
+#indices=`echo {45..55} {57..65}`
+#exp_dir="220425_cd4cre"
+#exp_data_dir="220425_klrg1_cd4cre"
+#m="3"
+#ql="30"
 
 # load and run script
 source ../../code/script.sh
