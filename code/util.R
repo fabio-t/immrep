@@ -53,15 +53,17 @@ radarcharts <- function(regexp, dirname, save = F, invert = F, colours = NULL) {
 
   dirname <- paste0("./radarcharts/one-vs-all/topPerc", tp, "/", dirname, "/")
 
-  l <- save_multiple_radarcharts(data, column_names, labels = column_names_2,
-                                 topPerc = tp, percentage = T, use_log = F,
-                                 dirname = dirname, use_colours = colours,
-                                 show_axis = F, show_legend = T)
+  l <- save_multiple_radarcharts(data, column_names,
+    labels = column_names_2,
+    topPerc = tp, percentage = T, use_log = F,
+    dirname = dirname, use_colours = colours,
+    show_axis = F, show_legend = T
+  )
 
   if (save && (length(l$common_clones) > 0)) {
     # common clones
-    d1 <- sweep(data, 2, colSums(data), "/")[l$common_clones, , drop=F]
-    d2 <- data[l$common_clones, , drop=F]
+    d1 <- sweep(data, 2, colSums(data), "/")[l$common_clones, , drop = F]
+    d2 <- data[l$common_clones, , drop = F]
     d3 <- as.data.frame(colRanks(as.matrix(d2), preserveShape = T, ties.method = "average"))
     colnames(d1) <- column_names_2
     colnames(d2) <- column_names_2
@@ -74,8 +76,8 @@ radarcharts <- function(regexp, dirname, save = F, invert = F, colours = NULL) {
 
   if (save && (length(l$total_clones) > 0)) {
     # common clones
-    d1 <- sweep(data, 2, colSums(data), "/")[l$total_clones, , drop=F]
-    d2 <- data[l$total_clones, , drop=F]
+    d1 <- sweep(data, 2, colSums(data), "/")[l$total_clones, , drop = F]
+    d2 <- data[l$total_clones, , drop = F]
     d3 <- as.data.frame(colRanks(as.matrix(d2), preserveShape = T, ties.method = "average"))
     colnames(d1) <- column_names_2
     colnames(d2) <- column_names_2
@@ -88,59 +90,67 @@ radarcharts <- function(regexp, dirname, save = F, invert = F, colours = NULL) {
 }
 
 # from https://bootstrappers.umassmed.edu/guides/main/r_writeFasta.html
-write.fasta <- function(data, filename){
-  fastaLines = c()
-  for (rowNum in 1:nrow(data)){
-    fastaLines = c(fastaLines, as.character(paste(">", data[rowNum,"name"], sep = "")))
-    fastaLines = c(fastaLines,as.character(data[rowNum,"seq"]))
+write.fasta <- function(data, filename) {
+  fastaLines <- c()
+  for (rowNum in 1:nrow(data)) {
+    fastaLines <- c(fastaLines, as.character(paste(">", data[rowNum, "name"], sep = "")))
+    fastaLines <- c(fastaLines, as.character(data[rowNum, "seq"]))
   }
-  fileConn<-file(filename)
+  fileConn <- file(filename)
   writeLines(fastaLines, fileConn)
   close(fileConn)
 }
 
-consensus_nt <- function(x){consensusString(DNAStringSet(x))}
-consensus_aa <- function(x){consensusString(AAStringSet(x))}
-transl_nt2aa <- function(x){as.character(translate(DNAString(x), if.fuzzy.codon="solve"))}
-
-# by default, two clones are split if they have < 85% similarity
-cloneclust <- function(x, h=0.15) {
-  if(length(x) == 1){return(1)}
-
-  aa_seqs <- as.matrix(as.AAbin(AAStringSet(x)))
-  seq_dist <- dist.aa(aa_seqs, scaled=T)
-  cl <- hclust(seq_dist, method="average")
-  cl$height = round(cl$height, digits=8)
-  # plot(cl)
-  # rect.hclust(cl, h=h, border="red")
-  cutree(cl, h=h)
+consensus_nt <- function(x) {
+  consensusString(DNAStringSet(x))
+}
+consensus_aa <- function(x) {
+  consensusString(AAStringSet(x))
+}
+transl_nt2aa <- function(x) {
+  as.character(translate(DNAString(x), if.fuzzy.codon = "solve"))
 }
 
-immload <- function(which="full", downsample=F) {
+# by default, two clones are split if they have < 85% similarity
+cloneclust <- function(x, h = 0.15) {
+  if (length(x) == 1) {
+    return(1)
+  }
+
+  aa_seqs <- as.matrix(as.AAbin(AAStringSet(x)))
+  seq_dist <- dist.aa(aa_seqs, scaled = T)
+  cl <- hclust(seq_dist, method = "average")
+  cl$height <- round(cl$height, digits = 8)
+  # plot(cl)
+  # rect.hclust(cl, h=h, border="red")
+  cutree(cl, h = h)
+}
+
+immload <- function(which = "full", downsample = F) {
   library(immunarch)
 
   if (which == "full") {
-    immdata <- repLoad(paste0("full/", rownames(mid_labels), ".csv"), .coding=F)
+    immdata <- repLoad(paste0("full/", rownames(mid_labels), ".csv"), .coding = F)
   } else {
-    immdata <- repLoad(paste0(tolower(rownames(mid_labels)), "_clones.csv"), .coding=F)
+    immdata <- repLoad(paste0(tolower(rownames(mid_labels)), "_clones.csv"), .coding = F)
     names(immdata$data) <- toupper(gsub("_clones", "", names(immdata$data)))
   }
 
   if (downsample == T) {
-    immdata$data <- repSample(immdata$data, .method="downsample")
+    immdata$data <- repSample(immdata$data, .method = "downsample")
   } else if (is.numeric(downsample)) {
-    immdata$data <- repSample(immdata$data, .method="downsample", .n=downsample)
+    immdata$data <- repSample(immdata$data, .method = "downsample", .n = downsample)
   }
 
-  meta <- cbind(Sample=rownames(mid_labels), mid_labels)
+  meta <- cbind(Sample = rownames(mid_labels), mid_labels)
   immdata$meta <- as_tibble(meta)
 
   return(immdata)
 }
 
-clones2groups <- function(immdata = NULL, overwrite = F, savefasta = F, dirname="fasta", join_by=NULL, collapse=F, downsample=F) {
+clones2groups <- function(immdata = NULL, overwrite = F, savefasta = F, dirname = "fasta", join_by = NULL, collapse = F, downsample = F) {
   if (is.null(immdata)) {
-    immdata <- immload(downsample=downsample)
+    immdata <- immload(downsample = downsample)
   }
 
   library(dplyr)
@@ -148,33 +158,46 @@ clones2groups <- function(immdata = NULL, overwrite = F, savefasta = F, dirname=
   library(Biostrings)
   library(ape)
 
-  immdata$data <- Map(function(x,y){tibble::add_column(x, Sample=y, .before=1)}, immdata$data, immdata$meta$Sample)
+  immdata$data <- Map(function(x, y) {
+    tibble::add_column(x, Sample = y, .before = 1)
+  }, immdata$data, immdata$meta$Sample)
   if (!is.null(join_by)) {
-    keep = which(!is.na(immdata$meta[, join_by, drop=T]))
-    immdata$meta = immdata$meta[keep, ]
-    immdata$data = immdata$data[keep]
-    immdata$data <- Map(function(x,y){tibble::add_column(x, JoinBy=y, .before=2)}, immdata$data, immdata$meta[, join_by, drop=T])
+    keep <- which(!is.na(immdata$meta[, join_by, drop = T]))
+    immdata$meta <- immdata$meta[keep, ]
+    immdata$data <- immdata$data[keep]
+    immdata$data <- Map(function(x, y) {
+      tibble::add_column(x, JoinBy = y, .before = 2)
+    }, immdata$data, immdata$meta[, join_by, drop = T])
   } else {
-    immdata$data <- Map(function(x,y){tibble::add_column(x, JoinBy=y, .before=2)}, immdata$data, immdata$meta$Sample)
+    immdata$data <- Map(function(x, y) {
+      tibble::add_column(x, JoinBy = y, .before = 2)
+    }, immdata$data, immdata$meta$Sample)
   }
   ## 12/03/2022 needed because of dev version and added broken fields
-  immdata$data <- lapply(immdata$data, function(y){select(y, -c("C.name","C.start","C.end"))})
-  all_d <- tibble(join_all(immdata$data, type="full"))
+  immdata$data <- lapply(immdata$data, function(y) {
+    select(y, -c("C.name", "C.start", "C.end"))
+  })
+  all_d <- tibble(join_all(immdata$data, type = "full"))
   all_d$JoinBy <- factor(all_d$JoinBy)
-  all_d$Sample <- factor(all_d$Sample, levels=names(immdata$data))
+  all_d$Sample <- factor(all_d$Sample, levels = names(immdata$data))
   all_d2 <- all_d %>%
-        arrange(JoinBy, desc(Clones)) %>%
-        mutate(len=str_length(CDR3.nt)) %>%
-        # group_by(V.name, J.name, len, JoinBy) %>%
-        group_by(Best.V, Best.J, len, JoinBy) %>%
-        mutate(id=str_c(cur_group_id(), cloneclust(CDR3.aa, 0.15), sep=".")) %>%
-        group_by(id, .add=T)
-  print(all_d2, width=Inf)
+    arrange(JoinBy, desc(Clones)) %>%
+    mutate(len = str_length(CDR3.nt)) %>%
+    # group_by(V.name, J.name, len, JoinBy) %>%
+    group_by(Best.V, Best.J, len, JoinBy) %>%
+    mutate(id = str_c(cur_group_id(), cloneclust(CDR3.aa, 0.15), sep = ".")) %>%
+    group_by(id, .add = T)
+  print(all_d2, width = Inf)
   if (collapse) {
-    all_d3 <- all_d2 %>% ungroup() %>% group_split(JoinBy, .keep=F)
+    all_d3 <- all_d2 %>%
+      ungroup() %>%
+      group_split(JoinBy, .keep = F)
     names(all_d3) <- levels(all_d$JoinBy)
   } else {
-    all_d3 <- all_d2 %>% ungroup() %>% select(-JoinBy) %>% group_split(Sample, .keep=T)
+    all_d3 <- all_d2 %>%
+      ungroup() %>%
+      select(-JoinBy) %>%
+      group_split(Sample, .keep = T)
     names(all_d3) <- names(immdata$data)
   }
 
@@ -182,7 +205,7 @@ clones2groups <- function(immdata = NULL, overwrite = F, savefasta = F, dirname=
     d <- all_d3[[name]]
 
     d2 <- d %>%
-          group_by(Best.V, Best.J, len, id)
+      group_by(Best.V, Best.J, len, id)
     print(d2)
 
     if (savefasta) {
@@ -208,10 +231,10 @@ clones2groups <- function(immdata = NULL, overwrite = F, savefasta = F, dirname=
       for (clone_id in unique(d3$id)) {
         print(clone_id)
         d4 <- d3 %>%
-              ungroup() %>%
-              filter(id == clone_id) %>%
-              arrange(desc(Clones))
-              # %>% slice_head(n=50) # keep from having too-large trees
+          ungroup() %>%
+          filter(id == clone_id) %>%
+          arrange(desc(Clones))
+        # %>% slice_head(n=50) # keep from having too-large trees
         if (nrow(d4) < 2) next # drop empty clones, but also singletons
         print(d4)
         # seqid <- paste(d4$Sample, d4$CDR3.nt, d4$CDR3.aa, d4$Clones, sep="|")
@@ -229,10 +252,10 @@ clones2groups <- function(immdata = NULL, overwrite = F, savefasta = F, dirname=
         # write.fasta(fasta_df, filename)
 
         ## using full vdj
-        fasta_df <- data.frame(name=seqid, seq=d4$Sequence)
-        path = make_path(paste0(dirname, "/", name, "_full"))
+        fasta_df <- data.frame(name = seqid, seq = d4$Sequence)
+        path <- make_path(paste0(dirname, "/", name, "_full"))
         print(path)
-        filename = paste0(path, str_replace(d4$Best.V[1], "/", ""), "_", str_replace(d4$Best.J[1], "/", ""), "_", d4$len[1], "_", d4$id[1], ".fasta")
+        filename <- paste0(path, str_replace(d4$Best.V[1], "/", ""), "_", str_replace(d4$Best.J[1], "/", ""), "_", d4$len[1], "_", d4$id[1], ".fasta")
         print(filename)
         write.fasta(fasta_df, filename)
       }
@@ -241,38 +264,39 @@ clones2groups <- function(immdata = NULL, overwrite = F, savefasta = F, dirname=
     # FIXME D.name, as well as V.end/J.start/D.start/D.end, will not necessarily
     # match when V, J, CDR3length and CDR3@85% end up grouped together
     d3 <- d2 %>%
-          summarise(cloneId=str_c(unique(id)), cloneSize=n(),
-                    cloneCount=sum(Clones), cloneFraction=sum(Proportion),
-                    nSeqCDR3=consensus_nt(CDR3.nt),
-                    # CDR3.aa=consensus_aa(CDR3.aa),
-                    aaSeqCDR3=transl_nt2aa(nSeqCDR3),
+      summarise(
+        cloneId = str_c(unique(id)), cloneSize = n(),
+        cloneCount = sum(Clones), cloneFraction = sum(Proportion),
+        nSeqCDR3 = consensus_nt(CDR3.nt),
+        # CDR3.aa=consensus_aa(CDR3.aa),
+        aaSeqCDR3 = transl_nt2aa(nSeqCDR3),
 
-                    # some extra stuff to caracterise the lineages
-                    # expsha=exp(diversity(Clones, index="shannon")),
-                    cloneDiversity=diversity(Clones, index="invsim"),
-                    # shan_even=diversity(Clones, index="shannon")/log(n()),
-                    # shan_even2=exp(diversity(Clones, index="shannon"))/n(),
-                    cloneEvenness=diversity(Clones, index="invsim")/n(),
+        # some extra stuff to caracterise the lineages
+        # expsha=exp(diversity(Clones, index="shannon")),
+        cloneDiversity = diversity(Clones, index = "invsim"),
+        # shan_even=diversity(Clones, index="shannon")/log(n()),
+        # shan_even2=exp(diversity(Clones, index="shannon"))/n(),
+        cloneEvenness = diversity(Clones, index = "invsim") / n(),
 
-                    # stuff for immunarch
-                    D.name=str_c(unique(D.name), collapse=","),
-                    V.end=str_c(unique(V.end), collapse=","),
-                    D.start=str_c(unique(D.start), collapse=","),
-                    D.end=str_c(unique(D.end), collapse=","),
-                    J.start=str_c(unique(J.start), collapse=","),
-                    VJ.ins=str_c(unique(VJ.ins), collapse=","),
-                    VD.ins=str_c(unique(VD.ins), collapse=","),
-                    DJ.ins=str_c(unique(DJ.ins), collapse=","),
-                    Sequence=str_c(unique(Sequence), collapse=","),
-                    Samples=str_c(unique(Sample), collapse=",")
-                    ) %>%
-          # slice_head() %>%
-          # ungroup() %>%
-          arrange(desc(cloneCount))
+        # stuff for immunarch
+        D.name = str_c(unique(D.name), collapse = ","),
+        V.end = str_c(unique(V.end), collapse = ","),
+        D.start = str_c(unique(D.start), collapse = ","),
+        D.end = str_c(unique(D.end), collapse = ","),
+        J.start = str_c(unique(J.start), collapse = ","),
+        VJ.ins = str_c(unique(VJ.ins), collapse = ","),
+        VD.ins = str_c(unique(VD.ins), collapse = ","),
+        DJ.ins = str_c(unique(DJ.ins), collapse = ","),
+        Sequence = str_c(unique(Sequence), collapse = ","),
+        Samples = str_c(unique(Sample), collapse = ",")
+      ) %>%
+      # slice_head() %>%
+      # ungroup() %>%
+      arrange(desc(cloneCount))
 
-    print(d3, width=Inf)
+    print(d3, width = Inf)
 
-    immdata$data[[name]] = d3
+    immdata$data[[name]] <- d3
   }
 
   if (overwrite) {
@@ -281,28 +305,29 @@ clones2groups <- function(immdata = NULL, overwrite = F, savefasta = F, dirname=
     for (name in names(all_d3)) {
       d <- immdata$data[[name]]
       d <- d %>%
-           # ungroup() %>%
-           select(cloneCount,
-                  nSeqCDR3, aaSeqCDR3,
-                  bestVHit = Best.V,
-                  bestJHit = Best.J,
-                  bestDHit = D.name,
-                  CDR3Length = len,
-                  cloneSize,
-                  cloneDiversity,
-                  cloneEvenness,
-                  cloneId,
-                  Samples,
-                  cloneFraction) %>%
-           as.data.frame()
+        # ungroup() %>%
+        select(cloneCount,
+          nSeqCDR3, aaSeqCDR3,
+          bestVHit = Best.V,
+          bestJHit = Best.J,
+          bestDHit = D.name,
+          CDR3Length = len,
+          cloneSize,
+          cloneDiversity,
+          cloneEvenness,
+          cloneId,
+          Samples,
+          cloneFraction
+        ) %>%
+        as.data.frame()
 
-      d$bestDHit = NA # removing D because of multiple hits
+      d$bestDHit <- NA # removing D because of multiple hits
 
       if (is.null(join_by)) {
-        d$Samples = NULL
+        d$Samples <- NULL
       }
 
-      write.table(d, file=paste0(tolower(name), "_clones.csv"), quote=F, row.names=F, sep="\t")
+      write.table(d, file = paste0(tolower(name), "_clones.csv"), quote = F, row.names = F, sep = "\t")
       # write.table(d, file=paste0("full/", name, ".csv"), quote=F, row.names=F, sep="\t")
     }
   }
@@ -320,9 +345,11 @@ overview <- function(dirname = "overview", immdata = NULL, exclude = NULL) {
 
   # downsamples to smallest clonality (NOT clonotypes)
   immdata2 <- immdata
-  immdata2$data <- repSample(immdata$data, .method="downsample")
+  immdata2$data <- repSample(immdata$data, .method = "downsample")
   n_clntps <- min(sapply(immdata2$data, nrow))
-  n_clones <- min(sapply(immdata2$data, function(x){sum(x$Clones)}))
+  n_clones <- min(sapply(immdata2$data, function(x) {
+    sum(x$Clones)
+  }))
 
   print(n_clntps)
   print(n_clones)
@@ -336,26 +363,26 @@ overview <- function(dirname = "overview", immdata = NULL, exclude = NULL) {
   dirname <- make_path(dirname)
   print(dirname)
 
- # + theme_minimal(base_size=12) + theme(axis.text.x = element_text(angle = 90))
+  # + theme_minimal(base_size=12) + theme(axis.text.x = element_text(angle = 90))
 
-  t1 <-  repExplore(immdata$data,  .method = "volume")
+  t1 <- repExplore(immdata$data, .method = "volume")
   t1b <- repExplore(immdata2$data, .method = "volume")
-  t2 <-  repExplore(immdata$data,  .method = "count")
+  t2 <- repExplore(immdata$data, .method = "count")
   t2b <- repExplore(immdata2$data, .method = "count")
-  p1 <-  vis(t1)
+  p1 <- vis(t1)
   p1b <- vis(t1b)
-  p2 <-  vis(t2)
+  p2 <- vis(t2)
   p2b <- vis(t2b)
   p1 + p2 + p1b + p2b
-  ggsave(filename = paste0(dirname, "basic.pdf"), width = 16, height = (9/16) * 16)
+  ggsave(filename = paste0(dirname, "basic.pdf"), width = 16, height = (9 / 16) * 16)
 
   # hill curves
-  hill_1 <- repDiversity(immdata$data,  "hill", .col="nt+v+j")
-  hill_2 <- repDiversity(immdata2$data, "hill", .col="nt+v+j")
+  hill_1 <- repDiversity(immdata$data, "hill", .col = "nt+v+j")
+  hill_2 <- repDiversity(immdata2$data, "hill", .col = "nt+v+j")
   p1 <- vis(hill_1, .meta = immdata$meta)
   p2 <- vis(hill_2, .meta = immdata2$meta)
   p1 + p2
-  ggsave(filename = paste0(dirname, "hill.pdf"), width = 16, height = (9/16) * 16)
+  ggsave(filename = paste0(dirname, "hill.pdf"), width = 16, height = (9 / 16) * 16)
 
   # # true diversity
   # div_1 <- repDiversity(immdata$data,  "div", .col="nt+v+j")
@@ -374,44 +401,44 @@ overview <- function(dirname = "overview", immdata = NULL, exclude = NULL) {
   # ggsave(filename = paste0(dirname, "ginisimpson.pdf"), width = 16, height = (9/16) * 16)
 
   # inverse-simpson index
-  invsimp_1 <- repDiversity(immdata$data,  "inv.simp", .col="nt+v+j")
-  invsimp_2 <- repDiversity(immdata2$data, "inv.simp", .col="nt+v+j")
+  invsimp_1 <- repDiversity(immdata$data, "inv.simp", .col = "nt+v+j")
+  invsimp_2 <- repDiversity(immdata2$data, "inv.simp", .col = "nt+v+j")
   p1 <- vis(invsimp_1, .meta = immdata$meta)
   p2 <- vis(invsimp_2, .meta = immdata2$meta)
   p1 + p2
-  ggsave(filename = paste0(dirname, "invsimpson.pdf"), width = 16, height = (9/16) * 16)
+  ggsave(filename = paste0(dirname, "invsimpson.pdf"), width = 16, height = (9 / 16) * 16)
 
   # number of clonotypes summing up to 50% abundance
-  d50_1 <- repDiversity(immdata$data,  "d50", .col="nt+v+j")
-  d50_2 <- repDiversity(immdata2$data, "d50", .col="nt+v+j")
+  d50_1 <- repDiversity(immdata$data, "d50", .col = "nt+v+j")
+  d50_2 <- repDiversity(immdata2$data, "d50", .col = "nt+v+j")
   p1 <- vis(d50_1, .meta = immdata$meta)
   p2 <- vis(d50_2, .meta = immdata2$meta)
   p1 + p2
-  ggsave(filename = paste0(dirname, "d50.pdf"), width = 16, height = (9/16) * 16)
+  ggsave(filename = paste0(dirname, "d50.pdf"), width = 16, height = (9 / 16) * 16)
 
   # rarefaction
-  raref_1 <- repDiversity(immdata$data,  "raref", .verbose = F, .norm=F, .col = "nt+v+j", .step = raref_step)
-  raref_2 <- repDiversity(immdata2$data, "raref", .verbose = F, .norm=F, .col = "nt+v+j", .step = raref_step)
-  p1 <-  vis(raref_1, .meta = immdata$meta)
-  p1b <- vis(raref_1, .meta = immdata$meta, .log=T)
-  p2 <-  vis(raref_2, .meta = immdata2$meta)
-  p2b <- vis(raref_2, .meta = immdata2$meta, .log=T)
+  raref_1 <- repDiversity(immdata$data, "raref", .verbose = F, .norm = F, .col = "nt+v+j", .step = raref_step)
+  raref_2 <- repDiversity(immdata2$data, "raref", .verbose = F, .norm = F, .col = "nt+v+j", .step = raref_step)
+  p1 <- vis(raref_1, .meta = immdata$meta)
+  p1b <- vis(raref_1, .meta = immdata$meta, .log = T)
+  p2 <- vis(raref_2, .meta = immdata2$meta)
+  p2b <- vis(raref_2, .meta = immdata2$meta, .log = T)
   p1 + p2
-  ggsave(filename = paste0(dirname, "raref.pdf"), width = 16, height = (9/16) * 16)
+  ggsave(filename = paste0(dirname, "raref.pdf"), width = 16, height = (9 / 16) * 16)
   p1b + p2b
-  ggsave(filename = paste0(dirname, "raref-log.pdf"), width = 16, height = (9/16) * 16)
+  ggsave(filename = paste0(dirname, "raref-log.pdf"), width = 16, height = (9 / 16) * 16)
 
   # rarefaction (normalised)
-  raref_1 <- repDiversity(immdata$data,  "raref", .verbose = F, .norm=T, .col = "nt+v+j", .step = raref_step)
-  raref_2 <- repDiversity(immdata2$data, "raref", .verbose = F, .norm=T, .col = "nt+v+j", .step = raref_step)
-  p1 <-  vis(raref_1, .meta = immdata$meta)
-  p1b <- vis(raref_1, .meta = immdata$meta, .log=T)
-  p2 <-  vis(raref_2, .meta = immdata2$meta)
-  p2b <- vis(raref_2, .meta = immdata2$meta, .log=T)
+  raref_1 <- repDiversity(immdata$data, "raref", .verbose = F, .norm = T, .col = "nt+v+j", .step = raref_step)
+  raref_2 <- repDiversity(immdata2$data, "raref", .verbose = F, .norm = T, .col = "nt+v+j", .step = raref_step)
+  p1 <- vis(raref_1, .meta = immdata$meta)
+  p1b <- vis(raref_1, .meta = immdata$meta, .log = T)
+  p2 <- vis(raref_2, .meta = immdata2$meta)
+  p2b <- vis(raref_2, .meta = immdata2$meta, .log = T)
   p1 + p2
-  ggsave(filename = paste0(dirname, "raref-norm.pdf"), width = 16, height = (9/16) * 16)
+  ggsave(filename = paste0(dirname, "raref-norm.pdf"), width = 16, height = (9 / 16) * 16)
   p1b + p2b
-  ggsave(filename = paste0(dirname, "raref-log-norm.pdf"), width = 16, height = (9/16) * 16)
+  ggsave(filename = paste0(dirname, "raref-log-norm.pdf"), width = 16, height = (9 / 16) * 16)
 }
 
 track_clones <- function(regexp, dirname, invert = F, n = 15, immdata = NULL) {
@@ -443,8 +470,8 @@ track_clones <- function(regexp, dirname, invert = F, n = 15, immdata = NULL) {
 
   for (mid in mid_list) {
     tc1 <- trackClonotypes(immdata$data, list(mid, n), .col = "v+nt+j")
-    vis(tc1) + theme_minimal(base_size=12) + theme(axis.text.x = element_text(angle = 90))
-    ggsave(filename = paste0(dirname, mid, ".pdf"), width = 16, height = (9/16) * 16)
+    vis(tc1) + theme_minimal(base_size = 12) + theme(axis.text.x = element_text(angle = 90))
+    ggsave(filename = paste0(dirname, mid, ".pdf"), width = 16, height = (9 / 16) * 16)
   }
 }
 
@@ -545,8 +572,7 @@ make_radarchart <- function(data, column_names, labels = NULL, topN = NULL, topP
 
       if (is.null(topPerc)) {
         df_rows <- rownames(df[1:min(nrow(df), topN), , drop = F])
-      }
-      else {
+      } else {
         print(sum(df))
         abundance <- sum(df) * topPerc
         print(abundance)
@@ -556,13 +582,11 @@ make_radarchart <- function(data, column_names, labels = NULL, topN = NULL, topP
 
       if (use_union) {
         common_rows <- union(common_rows, df_rows)
-      }
-      else {
+      } else {
         common_rows <- intersect(common_rows, df_rows)
       }
     }
-  }
-  else {
+  } else {
     # clones are provided, so we use them
     # note: topN is ignored
 
@@ -594,8 +618,8 @@ make_radarchart <- function(data, column_names, labels = NULL, topN = NULL, topP
   # to the original data (ie, before getting percentanges)
   orig_data <- as.data.frame(t(orig_data[common_rows, ]))
   colnames(orig_data) <- 1:ncol(orig_data)
-  organ_abund_counts <- rowSums(orig_data, na.rm=T)
-  organ_abund_perc <- rowSums(data, na.rm=T)
+  organ_abund_counts <- rowSums(orig_data, na.rm = T)
+  organ_abund_perc <- rowSums(data, na.rm = T)
 
   print("organ abundance:")
   print(organ_abund_counts)
@@ -604,26 +628,28 @@ make_radarchart <- function(data, column_names, labels = NULL, topN = NULL, topP
   if (minmax == "global") {
     # global minimum and maximum: this makes it easier to see
     # print(data)
-    minv <- min(sapply(data, FUN=function(x){x=x[is.finite(x)]; min(x)}))
+    minv <- min(sapply(data, FUN = function(x) {
+      x <- x[is.finite(x)]
+      min(x)
+    }))
     print(minv)
-    maxv <- max(sapply(data, FUN=function(x){x=x[is.finite(x)]; max(x)}))
+    maxv <- max(sapply(data, FUN = function(x) {
+      x <- x[is.finite(x)]
+      max(x)
+    }))
     print(maxv)
     data <- rbind(maxv, minv, data)
-  }
-  else if (minmax == "by-column") {
+  } else if (minmax == "by-column") {
     # by-organ max/min: might be hard to visualise
-    data <- rbind(colMax(data, na.rm=T), colMin(data, na.rm=T), data)
-  }
-  else if (minmax == "by-row") {
+    data <- rbind(colMax(data, na.rm = T), colMin(data, na.rm = T), data)
+  } else if (minmax == "by-row") {
     # by-organ max/min: might be hard to visualise
-    data <- rbind(rowMax(data, na.rm=T), rowMin(data, na.rm=T), data)
-  }
-  else if (length(minmax) == 2) {
+    data <- rbind(rowMax(data, na.rm = T), rowMin(data, na.rm = T), data)
+  } else if (length(minmax) == 2) {
     # [min, max]
 
     data <- rbind(rep(minmax[2], ncol(data)), rep(minmax[1], ncol(data)), data)
-  }
-  else {
+  } else {
     stop("ERROR: minmax argument wrong")
   }
 
@@ -647,8 +673,7 @@ make_radarchart <- function(data, column_names, labels = NULL, topN = NULL, topP
       # un-log it
       if (use_log) {
         center_labels <- sprintf("%.5f", exp(center_labels) - 1)
-      }
-      else {
+      } else {
         center_labels <- sprintf("%.5f", center_labels)
       }
 
@@ -656,8 +681,7 @@ make_radarchart <- function(data, column_names, labels = NULL, topN = NULL, topP
       if (percentage) {
         center_labels <- paste0(center_labels, "%")
       }
-    }
-    else {
+    } else {
       center_labels <- NULL
     }
 
@@ -667,8 +691,7 @@ make_radarchart <- function(data, column_names, labels = NULL, topN = NULL, topP
 
     if (show_axis) {
       axistype <- 1
-    }
-    else {
+    } else {
       axistype <- 0
 
       title <- paste(title, "| axis:", paste(center_labels, collapse = " "))
@@ -683,8 +706,7 @@ make_radarchart <- function(data, column_names, labels = NULL, topN = NULL, topP
     if (!is.null(legend_x)) {
       if (legend_counts || !percentage) {
         legend_values <- paste0(labels, " (", round(organ_abund_counts, digits = 3), ")")
-      }
-      else {
+      } else {
         legend_values <- paste0(labels, " (", round(organ_abund_perc * 100, digits = 3), "%)")
       }
 
@@ -725,8 +747,7 @@ save_multiple_radarcharts <- function(data, column_names, labels = NULL, topN = 
 
   if (is.null(use_colours) || length(use_colours) < length(column_names)) {
     colours <- distinctColorPalette(length(column_names))
-  }
-  else {
+  } else {
     colours <- use_colours
   }
 
@@ -765,8 +786,7 @@ save_multiple_radarcharts <- function(data, column_names, labels = NULL, topN = 
 
     if (is.null(topPerc)) {
       df_rows <- rownames(df[1:min(nrow(df), topN), , drop = F])
-    }
-    else {
+    } else {
       abundance <- sum(df) * topPerc
       df_rows <- rownames(df)[cumsum(df) <= abundance]
     }
@@ -783,8 +803,7 @@ save_multiple_radarcharts <- function(data, column_names, labels = NULL, topN = 
         labels = labels, use_clones = df_rows, sort_by_sum = F, minmax = minmax, percentage = percentage,
         use_log = use_log, colours_border = colours_border, colours_in = colours_in, show_axis = show_axis, legend_counts = legend_counts
       )
-    }
-    else {
+    } else {
       # each radarchart consists of the i-th organ topN clones sorted by abudance,
       # with the other organs following through
       l <- make_radarchart(data, column_names,
