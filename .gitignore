@@ -7,6 +7,9 @@ exp/
 !exp/*/*/code
 !exp/*/*/script*.sh
 
+# VSC
+immuno.code-workspace
+
 # Sciebo
 .sync*
 .owncloud*

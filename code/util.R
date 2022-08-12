@@ -232,7 +232,7 @@ clones2groups <- function(immdata = NULL, overwrite = F, savefasta = F, dirname=
         fasta_df <- data.frame(name=seqid, seq=d4$Sequence)
         path = make_path(paste0(dirname, "/", name, "_full"))
         print(path)
-        filename = paste0(path, d4$Best.V[1], "_", d4$Best.J[1], "_", d4$len[1], "_", d4$id[1], ".fasta")
+        filename = paste0(path, str_replace(d4$Best.V[1], "/", ""), "_", str_replace(d4$Best.J[1], "/", ""), "_", d4$len[1], "_", d4$id[1], ".fasta")
         print(filename)
         write.fasta(fasta_df, filename)
       }

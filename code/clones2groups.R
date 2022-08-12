@@ -19,7 +19,7 @@ source(root("code/util.R"))
 mid_labels <- read.csv("mid_labels.csv", row.names=1)
 print(mid_labels)
 
-if (is.null(opt$downsample)) {
+if (is.null(opt$downsample) || opt$downsample == "False" || opt$downsample == "F") {
   downsample = F
 } else if (opt$downsample == "True" || opt$downsample == "T") {
   downsample = T
