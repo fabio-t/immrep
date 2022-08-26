@@ -96,23 +96,21 @@ jointype="raw" # because it's clonal trees, we already strip alleles (FIXME not 
 # downsample="T"
 # groupby="colonisation,name"
 
-# exp_dir="220516_colonised_d5000"
-# exp_data_dir="220516_colonised"
-# indices=`echo {20..39}`
-# m="b"
-# ql="35"
-# downsample="5000"
-# #groupby="colonisation,name"
-# #bc="_safe_long2"
-
-exp_dir="220701_biopsy"
-exp_data_dir="220701_biopsy"
-indices=`echo {1..11} {13..17}`
-m="b"
+exp_dir="220516_colonised"
+exp_data_dir="220516_colonised"
+indices=`echo {20..39}`
+m="3"
 ql="30"
-downsample="T"
-#groupby="colonisation,name"
+#downsample="1000"
 bc="_safe_long2"
+
+# exp_dir="220701_biopsy"
+# exp_data_dir="220701_biopsy"
+# indices=`echo {1..11} {13..17}`
+# m="b"
+# ql="30"
+# downsample="T"
+# bc="_safe_long2"
 
 # load and run script
 source ../../code/script.sh

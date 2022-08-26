@@ -20,8 +20,10 @@ m=${m+_m${m}}
 ql1=$ql
 ql=${ql+_ql${ql}}
 
+d=${downsample:-"F"}
+
 execscript=${execscript:-$exp_dir}
-outdir="${exp_dir}_${tool}_m${m1}${ql}"
+outdir="${exp_dir}_${tool}_m${m1}${ql}_d${d}"
 
 echo $resdir
 echo $bc

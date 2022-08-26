@@ -8,7 +8,7 @@ R="R12"
 tool="mixcr"
 
 # migec="migec"
-# safe="_safe"
+# bc="_safe"
 
 # indices=`echo {1..11} {13..17} {19..21}`
 # exp_dir="170714_cultures"
@@ -179,11 +179,18 @@ tool="mixcr"
 # m="3"
 # ql="30"
 
-indices=`echo {1..11} 13`
-exp_dir="211203_220425_klrg1_merged"
-exp_data_dir="220330_220425_klrg1_merged"
-m="3"
+# indices=`echo {1..11} 13`
+# exp_dir="211203_220425_klrg1_merged"
+# exp_data_dir="220330_220425_klrg1_merged"
+# m="3"
+# ql="30"
+
+indices=`echo {1..11} {13..17} {19..31}`
+exp_dir="220218_itregtc4"
+exp_data_dir="220218_itregtc4"
+m="1"
 ql="30"
+bc="_safe_long2"
 
 # load and run script
 source ../../code/script.sh
