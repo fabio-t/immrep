@@ -702,7 +702,7 @@ track4 <- function(file1, file2, file3, file4, fileAliases = NULL, saveFolder = 
     }
 
     # Read data from file4 and add additional columns
-    D <- readData(file3)
+    D <- readData(file4)
     D$factors <- paste("D:", fileAliases[4])
     D$status <- 0
 

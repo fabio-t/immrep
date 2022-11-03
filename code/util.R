@@ -441,18 +441,31 @@ overview <- function(dirname = "overview", immdata = NULL, exclude = NULL) {
   ggsave(filename = paste0(dirname, "raref-log-norm.pdf"), width = 16, height = (9 / 16) * 16)
 }
 
-track_clones <- function(regexp, dirname, invert = F, n = 15, immdata = NULL) {
+track_clones <- function(regexp, dirname, indices = NULL, invert = F, n = 15, immdata = NULL) {
   if (is.null(immdata)) {
     immdata <- immload()
   }
 
-  if (is.null(regexp)) {
+  if (is.null(regexp) && is.null(indices)) {
     # one-vs-all
     dirname <- paste0("./tracking/all/")
     dirname <- make_path(dirname)
     print(dirname)
 
     mid_list <- rownames(mid_labels)
+  } else if (!is.null(indices)) {
+    dirname <- paste0("./tracking/", dirname, "/")
+    dirname <- make_path(dirname)
+    print(dirname)
+
+    column_indices <- indices
+
+    mid_list <- colnames(mids_counts)[column_indices]
+    label_list <- mid_names[column_indices]
+
+    print(label_list)
+
+    immdata$data <- immdata$data[column_indices]
   } else {
     dirname <- paste0("./tracking/", dirname, "/")
     dirname <- make_path(dirname)

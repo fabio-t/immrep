@@ -185,10 +185,31 @@ tool="mixcr"
 # m="3"
 # ql="30"
 
-indices=`echo {1..11} {13..17} {19..31}`
-exp_dir="220218_itregtc4"
-exp_data_dir="220218_itregtc4"
-m="1"
+# indices=`echo {1..11} {13..17} {19..31}`
+# exp_dir="220218_itregtc4"
+# exp_data_dir="220218_itregtc4"
+# m="1"
+# ql="30"
+# bc="_safe_long2"
+
+# indices=`echo 30 2 31 4 5 6 7 8 9`
+# exp_dir="221007_hh-treg-exp1"
+# exp_data_dir="221007_ana"
+# m="3"
+# ql="30"
+# bc="_safe_long2"
+
+# indices=`echo 10 11 13 14 15 16 17 19 20 21 22 23`
+# exp_dir="221007_anakadda2"
+# exp_data_dir="221007_ana"
+# m="3"
+# ql="30"
+# bc="_safe_long2"
+
+indices=`echo {24..29}`
+exp_dir="221007_clonekinetics"
+exp_data_dir="221007_ana"
+m="3"
 ql="30"
 bc="_safe_long2"
 

@@ -96,6 +96,7 @@ do
 
   nocache mixcr analyze amplicon $imgt -t $p $contig $germline --report mixcr_${i}/report.log --verbose -f --species $organism --starting-material rna --5-end v-primers --3-end $jprimers --adapters adapters-present --receptor-type ${chain} --region-of-interest $region --only-productive --align "-OreadsLayout=Collinear" --align "-OsaveOriginalReads=true" --assemble "-OseparateByC=${cgene}" --assemble "-OseparateByV=true" --assemble "-OseparateByJ=true" $quality --assemble "-OcloneClusteringParameters=null" assembly_${i}/S0_R1.t${m2}${cf2}.fastq assembly_${i}/S0_R2.t${m2}${cf2}.fastq mixcr_${i}/analysis
 
+  ##### FIXME clonotype counts should be -1 - check why
   echo -e "$i\t`cat histogram_${i}/estimates.txt | awk 'NR>1{print $3"\t"$4"\t"$5}'`\t`cat mixcr_${i}/analysis.clonotypes.${chain}.txt | awk 'NR>1{sum+=$2} END {print sum"\t"NR}'`" >> summary.csv
 done
 
