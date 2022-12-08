@@ -1,5 +1,5 @@
 library(circlize)
-circos4 = function(files,
+circos5 = function(files,
 				   fileAliases = NULL,
 				   saveFolder = NULL,
 				   cutoff = 1.0,
@@ -8,7 +8,7 @@ circos4 = function(files,
 				   linkColors = rep("#FF000080", 10),
 				   showLinks = rep(TRUE, 10)) {
 	# Catch invalid argument values
-	if(!is.null(fileAliases) && length(fileAliases) < 4) {
+	if(!is.null(fileAliases) && length(fileAliases) < 5) {
 		print("To few file aliases specified. Defaulting to file names.")
 		fileAliases = NULL
 	}
@@ -47,7 +47,7 @@ circos4 = function(files,
 		subset(data, select = -c(CDR3.nucleotide.sequence, CDR3.amino.acid.sequence, V.segments, J.segments, Percentage))
 	}
 	getStatus = function(data) {
-		temp = data.frame(one = unlist(data[5:8]), two = LETTERS[1:5])
+		temp = data.frame(one = unlist(data[5:9]), two = LETTERS[1:5])
 		statusLetters = paste(temp[temp$one > 0, "two"], collapse = "")
 		paste(nchar(statusLetters), statusLetters, sep = "")
 	}
@@ -180,7 +180,7 @@ circos4 = function(files,
 		D = D[1:cutoffIndex ,]
 	}
 
-	# Read data from file4 and add additional columns
+	# Read data from file5 and add additional columns
 	E = readData(file5)
 	E$factors = "E"
 	sum = sum(E$Count)
@@ -306,7 +306,7 @@ circos4 = function(files,
 	for(index_1 in 1:nrow(C)) {
 		for(index_2 in 1:nrow(E)) {
 			if(C$id[index_1] == E$id[index_2]){
-				C$linkIndexD[index_1] = index_2
+				C$linkIndexE[index_1] = index_2
 				E$linkIndexC[index_2] = index_1
 				linkSize = C$relCount[index_1] + E$relCount[index_2]
 				maxLinkSize = ifelse(maxLinkSize < linkSize, linkSize, maxLinkSize)
@@ -319,7 +319,7 @@ circos4 = function(files,
 		for(index_2 in 1:nrow(E)) {
 			if(D$id[index_1] == E$id[index_2]){
 				D$linkIndexE[index_1] = index_2
-				E$linkIndexC[index_2] = index_1
+				E$linkIndexD[index_2] = index_1
 				linkSize = D$relCount[index_1] + E$relCount[index_2]
 				maxLinkSize = ifelse(maxLinkSize < linkSize, linkSize, maxLinkSize)
 			}
@@ -612,7 +612,7 @@ circos4 = function(files,
 	dev.off()
 
 	# Store parameters for later reference
-	parameterFileName = paste(saveFolder, "circos4.csv", sep = "")
+	parameterFileName = paste(saveFolder, "circos5.csv", sep = "")
 	parameter = data.frame(diagrammName = c(diagrammName),
 			fileAlias1 = c(fileAliases[1]),
 			fileAlias2 = c(fileAliases[2]),

@@ -104,21 +104,14 @@ jointype="raw" # because it's clonal trees, we already strip alleles (FIXME not 
 # #downsample="1000"
 # bc="_safe_long2"
 
-# exp_dir="220701_biopsy"
-# exp_data_dir="220701_biopsy"
-# indices=`echo {1..11} {13..17}`
-# m="b"
-# ql="30"
-# downsample="T"
-# bc="_safe_long2"
-
-exp_dir="221007_biopsy"
-exp_data_dir="221007_biopsy"
-indices=`echo {19..26} {28..34}`
+exp_dir="220701_etc_biopsies"
+exp_data_dir="220701_etc_biopsies"
+indices=`echo {1..11} {13..17} {19..26} {28..34}`
 m="3"
 ql="30"
 downsample="F"
 bc="_safe_long2"
+
 
 # load and run script
 source ../../code/script.sh

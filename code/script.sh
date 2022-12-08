@@ -44,8 +44,7 @@ echo $groupby
 
 data_prefix="/mnt/storage/data/local/mol_med/${data_type}/${exp_data_dir}/samples"
 
-if [ $jointype == "raw" ]
-then
+if [ $jointype == "raw" ]; then
   hit="Hit"
 else
   hit="Gene"
@@ -55,48 +54,50 @@ fi
 # TODO add || exit 1 with a proper error correction after the main commands
 mkdir -p $outdir && cd $outdir
 mkdir -p stats collisions full
-for i in $indices
-do
-    if [[ $tool == "migec" ]]
-    then
-      cat ${data_prefix}/${resdir}/${R}${m}${bc}${ql}/cdrfinal_${i}/S0_${R}.csv | awk -F"\t" '{print $1"\t"$3"\t"$4"\t"$5"\t"$6"\t"$2}' > mid${i}_clones.csv
-      cat ${data_prefix}/${resdir}/${R}${m}${bc}${ql}/cdrfinal_${i}/S0_${R}.csv > full/MID${i}.csv
+for i in $indices; do
+  if [[ $tool == "migec" ]]; then
+    cat ${data_prefix}/${resdir}/${R}${m}${bc}${ql}/cdrfinal_${i}/S0_${R}.csv | awk -F"\t" '{print $1"\t"$3"\t"$4"\t"$5"\t"$6"\t"$2}' >mid${i}_clones.csv
+    cat ${data_prefix}/${resdir}/${R}${m}${bc}${ql}/cdrfinal_${i}/S0_${R}.csv >full/MID${i}.csv
+  else
+    mixcr exportClones -c $chain -t -o -vGene -jGene -dGene -cGene -p full -f ${data_prefix}/${resdir}/${R}${m}${bc}${ql}/mixcr_${i}/analysis.*clns full/MID${i}.csv
+    if [[ "$data_type" == "tcr" ]]; then
+      # FIXME: cannot use this until immunarch is fixed, so we apply a workaround
+      mixcr exportClones -c $chain -t -o -count -nFeature CDR3 -aaFeature CDR3 -vGene -jGene -dGene -cGene -fraction -cloneId -f ${data_prefix}/${resdir}/${R}${m}${bc}${ql}/mixcr_${i}/analysis.*clns mid${i}_clones.csv
+      sed -i 's/best\(V\|D\|J\|C\)Gene/best\1Hit/g' mid${i}_clones.csv
     else
+      # bcr data handles this in clones2groups
       mixcr exportClones -c $chain -t -o -count -nFeature CDR3 -aaFeature CDR3 -vHit -jHit -dHit -cHit -fraction -f ${data_prefix}/${resdir}/${R}${m}${bc}${ql}/mixcr_${i}/analysis.*clns mid${i}_clones.csv
-      mixcr exportClones -c $chain -t -o -vGene -jGene -dGene -cGene -p full -f ${data_prefix}/${resdir}/${R}${m}${bc}${ql}/mixcr_${i}/analysis.*clns full/MID${i}.csv
     fi
-    cat mid${i}_clones.csv |  awk '{print $2}' | sort -k1,1 | uniq -c | awk '{if($1 > 1){print $0}}' | sort -k1,1 -r > collisions/mid${i}_collision.csv
+  fi
+  cat mid${i}_clones.csv | awk '{print $2}' | sort -k1,1 | uniq -c | awk '{if($1 > 1){print $0}}' | sort -k1,1 -r >collisions/mid${i}_collision.csv
 done
 cp ${data_prefix}/${resdir}/${R}${m}${bc}${ql}/*.csv stats/
 cp ${data_prefix}/r{1,2}_stats.csv stats/
-if [[ -f "${data_prefix}/../mid_labels.csv" ]]
-then
+if [[ -f "${data_prefix}/../mid_labels.csv" ]]; then
   cp ${data_prefix}/../mid_labels.csv .
-elif [[ -f "${data_prefix}/../${exp_dir}.csv" ]]
-then
+elif [[ -f "${data_prefix}/../${exp_dir}.csv" ]]; then
   cp ${data_prefix}/../${exp_dir}.csv mid_labels.csv
 fi
 
 # TODO: need a script to remove duplicates in place and recalculate counts and frequencies (for cristoph's scripts)
 # might only be needed for t-cells as b-cells will be corrected via the below script
 
-if [ $data_type == "bcr" ]
-then
-  if [ -n "$downsample" ]
-  then
+if [[ "$data_type" == "bcr" ]]; then
+  if [ -n "$downsample" ]; then
     downsample="-d ${downsample}"
   fi
-  if [ -n "$groupby" ]
-  then
+  if [ -n "$groupby" ]; then
     groupby="-g ${groupby}"
   fi
-  Rscript /mnt/storage/data/code/clones2groups.R $downsample $groupby
-
-  for i in $indices
-  do
-    cat mid${i}_clones.csv |  awk '{print $2}' | sort -k1,1 | uniq -c | awk '{if($1 > 1){print $0}}' | sort -k1,1 -r > collisions/mid${i}_collision.csv
-  done
+  if [ -n "$savefasta" ]; then
+    savefasta="-s ${savefasta}"
+  fi
+  Rscript /mnt/storage/data/code/clones2groups.R $downsample $groupby $savefasta
 fi
+
+for i in $indices; do
+  cat mid${i}_clones.csv | awk '{print $2}' | sort -k1,1 | uniq -c | awk '{if($1 > 1){print $0}}' | sort -k1,1 -r >collisions/mid${i}_collision.csv
+done
 
 /mnt/storage/data/code/join_mids.py --unique --type $jointype $indices
 
@@ -107,15 +108,11 @@ Rscript /mnt/storage/data/code/family_usage_full.R
 # and loaded into the R scripts
 Rscript ../code/${execscript}.R
 
-if [ $data_type == "bcr" ]
-then
-  if [ -d "fasta_groups" ]
-  then
+if [ $data_type == "bcr" ]; then
+  if [ -d "fasta_groups" ]; then
     cd fasta_groups
-    for d in *
-    do
-      if [ -d $d ]
-      then
+    for d in *; do
+      if [ -d $d ]; then
         cd $d
         echo $d
         gctree.sh ${organism}

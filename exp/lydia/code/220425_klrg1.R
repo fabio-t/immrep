@@ -1,0 +1,34 @@
+
+library(rprojroot)
+
+root <- is_vcs_root$make_fix_file()
+
+source(root("code/util.R"))
+
+mid_labels <- read.csv("mid_labels.csv", row.names = 1)
+print(mid_labels)
+
+idata <- immload(which = "not full")
+
+mids_counts <- read.csv("mids_counts.csv", sep = "\t", row.names = 1)
+mid_names <- mid_labels[colnames(mids_counts), "label", drop = T]
+
+overview(immdata = idata)
+make_diversity(mids_counts, mid_names)
+
+## heatmaps
+
+heatmaps(NULL, NULL, cex = 0.5)
+heatmaps("bcat", "bcat")
+heatmaps("ctrl", "ctrl")
+heatmaps("m1", "m1")
+heatmaps("m4", "m4")
+heatmaps("m8", "m8")
+heatmaps("m9", "m9")
+
+track_clones(NULL, NULL, immdata = idata)
+track_clones("bcat", "bcat", immdata = idata)
+track_clones("ctrl", "ctrl", immdata = idata)
+track_clones("m1", "m1", immdata = idata)
+track_clones("m8", "m8", immdata = idata)
+track_clones("m9", "m9", immdata = idata)

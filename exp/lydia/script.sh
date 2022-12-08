@@ -6,6 +6,7 @@ resdir="umis"
 bc="_safe_long"
 R="R12"
 tool="mixcr"
+jointype="raw" # stripping them upstream now (8/12/2022)
 
 # migec="migec"
 # bc="_safe"
@@ -192,12 +193,12 @@ tool="mixcr"
 # ql="30"
 # bc="_safe_long2"
 
-# indices=`echo 30 2 31 4 5 6 7 8 9`
-# exp_dir="221007_hh-treg-exp1"
-# exp_data_dir="221007_ana"
-# m="3"
-# ql="30"
-# bc="_safe_long2"
+indices=`echo 30 2 31 4 5 6 7 8 9`
+exp_dir="221007_hh-treg-exp1"
+exp_data_dir="221007_ana"
+m="3"
+ql="30"
+bc="_safe_long2"
 
 # indices=`echo 10 11 13 14 15 16 17 19 20 21 22 23`
 # exp_dir="221007_anakadda2"
@@ -206,12 +207,27 @@ tool="mixcr"
 # ql="30"
 # bc="_safe_long2"
 
-indices=`echo {24..29}`
-exp_dir="221007_clonekinetics"
-exp_data_dir="221007_ana"
-m="3"
-ql="30"
-bc="_safe_long2"
+# indices=`echo {24..29}`
+# exp_dir="221007_clonekinetics"
+# exp_data_dir="221007_ana"
+# m="3"
+# ql="30"
+# bc="_safe_long2"
+
+# indices=`echo {1..11} {13..16}`
+# exp_dir="220928_cd4cre"
+# exp_data_dir="220928_cd4cre"
+# m="3"
+# ql="30"
+# bc="_safe_long2"
+
+# indices=`echo {1..11} {13..17} {19..34}`
+# exp_dir="221021_nktbonn"
+# exp_data_dir="221021_nktbonn"
+# m="3"
+# ql="30"
+# bc="_safe_long2"
+# chain="TCR"
 
 # load and run script
 source ../../code/script.sh
