@@ -499,7 +499,7 @@ make_diversity <- function(mids_counts, mid_names) {
   divers_df$ShannonEvenness <- divers_df$Shannon / log(divers_df$NumberOfClones)
   divers_df$InvSimpson <- diversity(t_df, index = "invsimpson")
   divers_df$InvSimpsonEvenness <- divers_df$InvSimpson / divers_df$NumberOfClones
-  write.csv(divers_df, file = "diversity.csv")
+  write.table(divers_df, file = "diversity.csv", quote = FALSE, sep = "\t", row.names = F)
 }
 
 make_full_heatmap <- function(data, method, labels = NULL, binary = F, dirname = "heatmaps",

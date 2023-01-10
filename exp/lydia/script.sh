@@ -174,12 +174,14 @@ jointype="raw" # stripping them upstream now (8/12/2022)
 # m="3"
 # ql="30"
 
+###### TODO: rerun with newer mixcr
 # indices=`echo {45..55} {57..65}`
 # exp_dir="220425_cd4cre"
 # exp_data_dir="220425_klrg1_cd4cre"
 # m="3"
 # ql="30"
 
+### TODO: rerun with newer mixcr
 # indices=`echo {1..11} 13`
 # exp_dir="211203_220425_klrg1_merged"
 # exp_data_dir="220330_220425_klrg1_merged"
@@ -189,16 +191,16 @@ jointype="raw" # stripping them upstream now (8/12/2022)
 # indices=`echo {1..11} {13..17} {19..31}`
 # exp_dir="220218_itregtc4"
 # exp_data_dir="220218_itregtc4"
-# m="1"
+# m="2"
 # ql="30"
 # bc="_safe_long2"
 
-indices=`echo 30 2 31 4 5 6 7 8 9`
-exp_dir="221007_hh-treg-exp1"
-exp_data_dir="221007_ana"
-m="3"
-ql="30"
-bc="_safe_long2"
+# indices=`echo 30 2 31 4 5 6 7 8 9`
+# exp_dir="221007_hh-treg-exp1"
+# exp_data_dir="221007_ana"
+# m="3"
+# ql="30"
+# bc="_safe_long2"
 
 # indices=`echo 10 11 13 14 15 16 17 19 20 21 22 23`
 # exp_dir="221007_anakadda2"
@@ -228,6 +230,20 @@ bc="_safe_long2"
 # ql="30"
 # bc="_safe_long2"
 # chain="TCR"
+
+# indices=`echo {1..11} 13`
+# exp_dir="221209_hh2"
+# exp_data_dir="221209_hh2_mismatch12"
+# m="3"
+# ql="30"
+# bc="_safe_long2"
+
+indices=`echo {14..17} {19..40}`
+exp_dir="221209_mm1-mm2"
+exp_data_dir="221209_hh2_mismatch12"
+m="3"
+ql="30"
+bc="_safe_long2"
 
 # load and run script
 source ../../code/script.sh

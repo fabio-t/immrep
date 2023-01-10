@@ -106,12 +106,13 @@ jointype="raw" # because it's clonal trees, we already strip alleles (FIXME not 
 
 exp_dir="220701_etc_biopsies"
 exp_data_dir="220701_etc_biopsies"
-indices=`echo {1..11} {13..17} {19..26} {28..34}`
+# excluding 41, failed
+indices=`echo {1..11} {13..17} {19..26} {28..34} 39 40 {42..54}`
 m="3"
 ql="30"
 downsample="F"
+groupby="mouse"
 bc="_safe_long2"
-
 
 # load and run script
 source ../../code/script.sh
