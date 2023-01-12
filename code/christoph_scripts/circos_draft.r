@@ -1,15 +1,35 @@
 library(circlize)
-circos4 <- function(files,
-                    fileAliases = NULL,
-                    saveFolder = NULL,
-                    cutoff = 1.0,
-                    sort = FALSE,
-                    countColors = c("#FFFFFFFF", "#0000FFFF"),
-                    linkColors = rep("#FF000080", 10),
-                    showLinks = rep(TRUE, 10)) {
+
+# Helper functions
+readData <- function(file) {
+    data <- read.csv(file, header = TRUE, sep = "\t")
+    data <- cbind(data, data.frame(id = paste(data$nSeqCDR3, data$bestVHit, data$bestJHit, sep = "_")))
+    subset(data, select = c(id, cloneCount))
+}
+
+getStatus <- function(data, n) {
+    m <- n + 4
+    temp <- data.frame(one = unlist(data[5:m]), two = LETTERS[1:n])
+    statusLetters <- paste(temp[temp$one > 0, "two"], collapse = "")
+    paste(nchar(statusLetters), statusLetters, sep = "")
+}
+
+circos <- function(files,
+                   fileAliases = NULL,
+                   saveFolder = NULL,
+                   cutoff = 1.0,
+                   sort = FALSE,
+                   countColors = c("#FFFFFFFF", "#0000FFFF"),
+                   linkColors = rep("#FF000080", 10),
+                   showLinks = rep(TRUE, 10)) {
+    nfiles <- length(files)
+
     # Catch invalid argument values
-    if (!is.null(fileAliases) && length(fileAliases) < 4) {
-        print("To few file aliases specified. Defaulting to file names.")
+    if (nfiles < 2) {
+        stop("Too few files specified. Minimum of 2")
+    }
+    if (!is.null(fileAliases) && length(fileAliases) != nfiles) {
+        print("Too few file aliases specified. Defaulting to file names.")
         fileAliases <- NULL
     }
     if (cutoff < 0.0) {
@@ -80,105 +100,44 @@ circos4 <- function(files,
     diagrammName <- paste(fileNames, sep = "_")
     diagrammFileName <- paste(saveFolder, diagrammName, "_circos.svg", sep = "")
 
-	data = list()
-    for (i in 1:10) {
+    data <- list()
+    for (i in 1:nfiles) {
         # Read data from file and add additional columns
-		file = files[i]
-		letter = LETTERS[i]
+        file <- files[i]
+        letter <- LETTERS[i]
         data[[letter]] <- readData(file)
         data[[letter]]$factors <- letter
         sum <- sum(data[[letter]]$Count)
         data[[letter]]$relCount <- data[[letter]]$Count / sum
-		for (j in )
-        data[[letter]]$linkIndexA <- 1
-        data[[letter]]$linkIndexB <- 0
-        data[[letter]]$linkIndexC <- 0
-        data[[letter]]$linkIndexD <- 0
 
-        # Perform cutoff
-        if (cutoff < 1) {
-            cur <- 0
-            cutoffIndex <- nrow(A)
-            for (index in 1:nrow(A)) {
-                cur <- cur + A$relCount[index]
-                if (cur > cutoff) {
-                    cutoffIndex <- index
-                    break
-                }
+        # now iterate across all letters,
+        # adding dynamically the linkedIndexX columns
+        # with their respective pattern
+        for (j in nfiles) {
+            # if i == j, and the i-th letter is X,
+            # then the value is 1. Otherwise it's 0
+
+            link_index_col <- paste0("linkIndex", LETTERS[j])
+
+            if (i == j) {
+                data[[letter]][link_index_col] <- 1
+            } else {
+                data[[letter]][link_index_col] <- 0
             }
-            A <- A[1:cutoffIndex, ]
         }
 
-        # Read data from file2 and add additional columns
-        B <- readData(file2)
-        B$factors <- "B"
-        sum <- sum(B$Count)
-        B$relCount <- B$Count / sum
-        B$linkIndexA <- 0
-        B$linkIndexB <- 1
-        B$linkIndexC <- 0
-        B$linkIndexD <- 0
-
         # Perform cutoff
         if (cutoff < 1) {
             cur <- 0
-            cutoffIndex <- nrow(B)
-            for (index in 1:nrow(B)) {
-                cur <- cur + B$relCount[index]
+            cutoffIndex <- nrow(data[[letter]])
+            for (index in 1:nrow(data[[letter]])) {
+                cur <- cur + data[[letter]]$relCount[index]
                 if (cur > cutoff) {
                     cutoffIndex <- index
                     break
                 }
             }
-            B <- B[1:cutoffIndex, ]
-        }
-
-        # Read data from file3 and add additional columns
-        C <- readData(file3)
-        C$factors <- "C"
-        sum <- sum(C$Count)
-        C$relCount <- C$Count / sum
-        C$linkIndexA <- 0
-        C$linkIndexB <- 0
-        C$linkIndexC <- 1
-        C$linkIndexD <- 0
-
-        # Perform cutoff
-        if (cutoff < 1) {
-            cur <- 0
-            cutoffIndex <- nrow(C)
-            for (index in 1:nrow(C)) {
-                cur <- cur + C$relCount[index]
-                if (cur > cutoff) {
-                    cutoffIndex <- index
-                    break
-                }
-            }
-            C <- C[1:cutoffIndex, ]
-        }
-
-        # Read data from file4 and add additional columns
-        D <- readData(file4)
-        D$factors <- "D"
-        sum <- sum(D$Count)
-        D$relCount <- D$Count / sum
-        D$linkIndexA <- 0
-        D$linkIndexB <- 0
-        D$linkIndexC <- 0
-        D$linkIndexD <- 1
-
-        # Perform cutoff
-        if (cutoff < 1) {
-            cur <- 0
-            cutoffIndex <- nrow(D)
-            for (index in 1:nrow(D)) {
-                cur <- cur + D$relCount[index]
-                if (cur > cutoff) {
-                    cutoffIndex <- index
-                    break
-                }
-            }
-            D <- D[1:cutoffIndex, ]
+            data[[letter]] <- data[[letter]][1:cutoffIndex, ]
         }
     }
 
