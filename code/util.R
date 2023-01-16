@@ -204,6 +204,9 @@ clones2groups <- function(immdata = NULL, overwrite = F, savefasta = F, dirname 
   for (name in names(all_d3)) {
     d <- all_d3[[name]]
 
+    # sum of all clones across samples (if joined)
+    all_clones <- sum(d$Clones)
+
     d2 <- d %>%
       group_by(Best.V, Best.J, len, id)
     print(d2)
@@ -265,8 +268,10 @@ clones2groups <- function(immdata = NULL, overwrite = F, savefasta = F, dirname 
     # match when V, J, CDR3length and CDR3@85% end up grouped together
     d3 <- d2 %>%
       summarise(
-        cloneId = str_c(unique(id)), cloneSize = n(),
-        cloneCount = sum(Clones), cloneFraction = sum(Proportion),
+        cloneId = str_c(unique(id)),
+        cloneSize = n(),
+        cloneCount = sum(Clones),
+        cloneFraction = cloneCount / all_clones,
         nSeqCDR3 = consensus_nt(CDR3.nt),
         # CDR3.aa=consensus_aa(CDR3.aa),
         aaSeqCDR3 = transl_nt2aa(nSeqCDR3),
