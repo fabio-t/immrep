@@ -1,11 +1,18 @@
 library(circlize)
 
-# Helper functions
+# COMMENT THIS IF YOU USE THE OLD MIDX_CLONES.CSV FILES
 readData <- function(file) {
     data <- read.csv(file, header = TRUE, sep = "\t")
     data <- cbind(data, data.frame(id = paste(data$nSeqCDR3, data$bestVHit, data$bestJHit, sep = "_")))
     subset(data, select = c(id, cloneCount))
 }
+
+# COMMENT THIS IF YOU USE THE NEW MIDX_CLONES.CSV FILES
+# readData <- function(file) {
+#     data <- read.table(file, header = TRUE, sep = "\t")
+#     data <- cbind(data, data.frame(id = paste(data$CDR3.nucleotide.sequence, data$V.segments, data$J.segments, sep = "_")))
+#     subset(data, select = c(id, cloneCount))
+# }
 
 getStatus <- function(data, n) {
     m <- n + 4

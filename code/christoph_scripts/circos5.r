@@ -1,5 +1,5 @@
 library(circlize)
-circos5 <- function(files,
+circos5 <- function(file1, file2, file3, file4, file5,
                     fileAliases = NULL,
                     saveFolder = NULL,
                     cutoff = 1.0,
@@ -42,7 +42,7 @@ circos5 <- function(files,
 
     # Helper functions
     readData <- function(file) {
-        data <- read.csv(file, header = TRUE, sep = ",", colClasses = c("integer", "character", "character", "character", "character", "numeric"))
+        data <- read.table(file, header = TRUE, sep = "\t", colClasses = c("integer", "character", "character", "character", "character", "numeric"))
         data <- cbind(data, data.frame(id = paste(data$CDR3.nucleotide.sequence, data$V.segments, data$J.segments, sep = "")))
         subset(data, select = -c(CDR3.nucleotide.sequence, CDR3.amino.acid.sequence, V.segments, J.segments, Percentage))
     }
@@ -53,23 +53,26 @@ circos5 <- function(files,
     }
 
     # Extract file names
-    fileParts <- c()
-    fileNames <- c()
-    for (file in files) {
-        filePart <- unlist(strsplit(file, "/"))
-        fileParts <- c(fileParts, filePart)
-        fileNames <- c(fileNames, unlist(strsplit(filePart[length(filePart)], "[.]"))[1])
-    }
+    file1Parts <- unlist(strsplit(file1, "/"))
+    file1Name <- unlist(strsplit(file1Parts[length(file1Parts)], "[.]"))[1]
+    file2Parts <- unlist(strsplit(file2, "/"))
+    file2Name <- unlist(strsplit(file2Parts[length(file2Parts)], "[.]"))[1]
+    file3Parts <- unlist(strsplit(file3, "/"))
+    file3Name <- unlist(strsplit(file3Parts[length(file3Parts)], "[.]"))[1]
+    file4Parts <- unlist(strsplit(file4, "/"))
+    file4Name <- unlist(strsplit(file4Parts[length(file4Parts)], "[.]"))[1]
+    file5Parts <- unlist(strsplit(file4, "/"))
+    file5Name <- unlist(strsplit(file5Parts[length(file5Parts)], "[.]"))[1]
 
     # Set file aliases if not provided
     if (is.null(fileAliases)) {
-        fileAliases <- fileNames
+        fileAliases <- c(file1Name, file2Name, file3Name, file4Name, file5Name)
     }
 
     # Create save folder name if not provided
     if (is.null(saveFolder)) {
-        if (length(filePart) > 1) {
-            saveFolder <- paste(filePart[1:length(filePart) - 1], collapse = "/")
+        if (length(file1Parts) > 1) {
+            saveFolder <- paste(file1Parts[1:length(file1Parts) - 1], collapse = "/")
             saveFolder <- paste(saveFolder, "/", sep = "")
         } else {
             saveFolder <- ""
@@ -77,7 +80,7 @@ circos5 <- function(files,
     }
 
     # Create diagramm name
-    diagrammName <- paste(fileNames, sep = "_")
+    diagrammName <- paste(file1Name, file2Name, file3Name, file4Name, file5Name, sep = "_")
     diagrammFileName <- paste(saveFolder, diagrammName, "_circos.svg", sep = "")
 
     # Read data from file1 and add additional columns

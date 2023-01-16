@@ -7,8 +7,9 @@ exp/
 !exp/*/*/code
 !exp/*/*/script*.sh
 
-# VSC
+# editor 
 immuno.code-workspace
+immrep.code-workspace
 
 # Sciebo
 .sync*

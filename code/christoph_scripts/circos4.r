@@ -35,7 +35,7 @@ circos4 <- function(file1, file2, file3, file4, fileAliases = NULL, saveFolder =
 
     # Helper functions
     readData <- function(file) {
-        data <- read.csv(file, header = TRUE, sep = ",", colClasses = c("integer", "character", "character", "character", "character", "numeric"))
+        data <- read.table(file, header = TRUE, sep = "\t", colClasses = c("integer", "character", "character", "character", "character", "numeric"))
         data <- cbind(data, data.frame(id = paste(data$CDR3.nucleotide.sequence, data$V.segments, data$J.segments, sep = "")))
         subset(data, select = -c(CDR3.nucleotide.sequence, CDR3.amino.acid.sequence, V.segments, J.segments, Percentage))
     }
