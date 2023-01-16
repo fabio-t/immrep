@@ -1,5 +1,15 @@
 library(circlize)
-circos4 <- function(file1, file2, file3, file4, fileAliases = NULL, saveFolder = NULL, cutoff = 1.0, sort = FALSE, countColors = c("#FFFFFFFF", "#0000FFFF"), linkColors = c("#FF000080", "#FF000080", "#FF000080", "#FF000080", "#FF000080", "#FF000080"), showLinks = c(TRUE, TRUE, TRUE, TRUE, TRUE, TRUE)) {
+circos4 <- function(file1,
+                    file2,
+                    file3,
+                    file4,
+                    fileAliases = NULL,
+                    saveFolder = NULL,
+                    cutoff = 1.0,
+                    sort = FALSE,
+                    countColors = c("#FFFFFFFF", "#0000FFFF"),
+                    linkColors = c("#FF000080", "#FF000080", "#FF000080", "#FF000080", "#FF000080", "#FF000080"),
+                    showLinks = c(TRUE, TRUE, TRUE, TRUE, TRUE, TRUE)) {
     # Catch invalid argument values
     if (!is.null(fileAliases) && length(fileAliases) < 4) {
         print("To few file aliases specified. Defaulting to file names.")

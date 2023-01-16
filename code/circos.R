@@ -11,7 +11,8 @@ readData <- function(file) {
 # readData <- function(file) {
 #     data <- read.table(file, header = TRUE, sep = "\t")
 #     data <- cbind(data, data.frame(id = paste(data$CDR3.nucleotide.sequence, data$V.segments, data$J.segments, sep = "_")))
-#     subset(data, select = c(id, cloneCount))
+#     data <- subset(data, select = c(id, Count))
+#     colnames(data)[2] <- "cloneCount"
 # }
 
 getStatus <- function(data, n) {
@@ -19,6 +20,31 @@ getStatus <- function(data, n) {
     temp <- data.frame(one = unlist(data[5:m]), two = LETTERS[1:n])
     statusLetters <- paste(temp[temp$one > 0, "two"], collapse = "")
     paste(nchar(statusLetters), statusLetters, sep = "")
+}
+
+circos <- function(files,
+                   fileAliases = NULL,
+                   saveFolder = NULL,
+                   cutoff = 1.0,
+                   sort = FALSE,
+                   countColors = c("#FFFFFFFF", "#0000FFFF"),
+                   linkColors = rep("#FF000080", ifelse(length(files) == 1, 1, length(combn(length(files), 2)))),
+                   showLinks = rep(TRUE, length(combn(length(files), 2)))) {
+    nFiles <- length(files)
+
+    if (nFiles == 1) {
+        circos1(files[1], fileAliases, saveFolder, cutoff, countColors)
+    } else if (nFiles == 2) {
+        circos2(files[1], files[2], fileAliases, saveFolder, cutoff, sort, countColors, linkColors)
+    } else if (nFiles == 3) {
+        circos3(files[1], files[2], files[3], fileAliases, saveFolder, cutoff, sort, countColors, linkColors, showLinks)
+    } else if (nFiles == 4) {
+        circos4(files[1], files[2], files[3], files[4], fileAliases, saveFolder, cutoff, sort, countColors, linkColors, showLinks)
+    } else if (nFiles == 5) {
+        circos5(files[1], files[2], files[3], files[4], files[5], fileAliases, saveFolder, cutoff, sort, countColors, linkColors, showLinks)
+    } else if (nFiles == 6) {
+        circos6(files[1], files[2], files[3], files[4], files[5], files[6], fileAliases, saveFolder, cutoff, sort, countColors, linkColors, showLinks)
+    }
 }
 
 circos1 <- function(file1,
@@ -32,7 +58,7 @@ circos1 <- function(file1,
         fileAliases <- NULL
     }
     if (cutoff < 0.0) {
-        pirnt("Cutoff value is below zero. Defaulting to 1.0.")
+        print("Cutoff value is below zero. Defaulting to 1.0.")
         cutoff <- 1.0
     }
     if (cutoff > 1.0) {
@@ -170,7 +196,7 @@ circos2 <- function(file1, file2,
         fileAliases <- NULL
     }
     if (cutoff < 0.0) {
-        pirnt("Cutoff value is below zero. Defaulting to 1.0.")
+        print("Cutoff value is below zero. Defaulting to 1.0.")
         cutoff <- 1.0
     }
     if (cutoff > 1.0) {
@@ -401,20 +427,20 @@ circos2 <- function(file1, file2,
 }
 
 circos3 <- function(file1, file2, file3,
-					fileAliases = NULL,
-					saveFolder = NULL,
-					cutoff = 1.0,
-					sort = FALSE,
-					countColors = c("#FFFFFFFF", "#0000FFFF"),
-					linkColors = c("#FF000080", "#FF000080", "#FF000080"),
-					showLinks = c(TRUE, TRUE, TRUE)) {
+                    fileAliases = NULL,
+                    saveFolder = NULL,
+                    cutoff = 1.0,
+                    sort = FALSE,
+                    countColors = c("#FFFFFFFF", "#0000FFFF"),
+                    linkColors = c("#FF000080", "#FF000080", "#FF000080"),
+                    showLinks = c(TRUE, TRUE, TRUE)) {
     # Catch invalid argument values
     if (!is.null(fileAliases) && length(fileAliases) < 3) {
         print("To few file aliases specified. Defaulting to file names.")
         fileAliases <- NULL
     }
     if (cutoff < 0.0) {
-        pirnt("Cutoff value is below zero. Defaulting to 1.0.")
+        print("Cutoff value is below zero. Defaulting to 1.0.")
         cutoff <- 1.0
     }
     if (cutoff > 1.0) {
@@ -762,20 +788,20 @@ circos3 <- function(file1, file2, file3,
 }
 
 circos4 <- function(file1, file2, file3, file4,
-					fileAliases = NULL,
-					saveFolder = NULL,
-					cutoff = 1.0,
-					sort = FALSE,
-					countColors = c("#FFFFFFFF", "#0000FFFF"),
-					linkColors = c("#FF000080", "#FF000080", "#FF000080", "#FF000080", "#FF000080", "#FF000080"),
-					showLinks = c(TRUE, TRUE, TRUE, TRUE, TRUE, TRUE)) {
+                    fileAliases = NULL,
+                    saveFolder = NULL,
+                    cutoff = 1.0,
+                    sort = FALSE,
+                    countColors = c("#FFFFFFFF", "#0000FFFF"),
+                    linkColors = c("#FF000080", "#FF000080", "#FF000080", "#FF000080", "#FF000080", "#FF000080"),
+                    showLinks = c(TRUE, TRUE, TRUE, TRUE, TRUE, TRUE)) {
     # Catch invalid argument values
     if (!is.null(fileAliases) && length(fileAliases) < 4) {
         print("To few file aliases specified. Defaulting to file names.")
         fileAliases <- NULL
     }
     if (cutoff < 0.0) {
-        pirnt("Cutoff value is below zero. Defaulting to 1.0.")
+        print("Cutoff value is below zero. Defaulting to 1.0.")
         cutoff <- 1.0
     }
     if (cutoff > 1.0) {
@@ -1275,7 +1301,7 @@ circos5 <- function(file1, file2, file3, file4, file5,
         fileAliases <- NULL
     }
     if (cutoff < 0.0) {
-        pirnt("Cutoff value is below zero. Defaulting to 1.0.")
+        print("Cutoff value is below zero. Defaulting to 1.0.")
         cutoff <- 1.0
     }
     if (cutoff > 1.0) {
@@ -1336,8 +1362,8 @@ circos5 <- function(file1, file2, file3, file4, file5,
     # Read data from file1 and add additional columns
     A <- readData(file1)
     A$factors <- "A"
-    sum <- sum(A$Count)
-    A$relCount <- A$Count / sum
+    sum <- sum(A$cloneCount)
+    A$relCount <- A$cloneCount / sum
     A$linkIndexA <- 1
     A$linkIndexB <- 0
     A$linkIndexC <- 0
@@ -1361,8 +1387,8 @@ circos5 <- function(file1, file2, file3, file4, file5,
     # Read data from file2 and add additional columns
     B <- readData(file2)
     B$factors <- "B"
-    sum <- sum(B$Count)
-    B$relCount <- B$Count / sum
+    sum <- sum(B$cloneCount)
+    B$relCount <- B$cloneCount / sum
     B$linkIndexA <- 0
     B$linkIndexB <- 1
     B$linkIndexC <- 0
@@ -1386,8 +1412,8 @@ circos5 <- function(file1, file2, file3, file4, file5,
     # Read data from file3 and add additional columns
     C <- readData(file3)
     C$factors <- "C"
-    sum <- sum(C$Count)
-    C$relCount <- C$Count / sum
+    sum <- sum(C$cloneCount)
+    C$relCount <- C$cloneCount / sum
     C$linkIndexA <- 0
     C$linkIndexB <- 0
     C$linkIndexC <- 1
@@ -1411,8 +1437,8 @@ circos5 <- function(file1, file2, file3, file4, file5,
     # Read data from file4 and add additional columns
     D <- readData(file4)
     D$factors <- "D"
-    sum <- sum(D$Count)
-    D$relCount <- D$Count / sum
+    sum <- sum(D$cloneCount)
+    D$relCount <- D$cloneCount / sum
     D$linkIndexA <- 0
     D$linkIndexB <- 0
     D$linkIndexC <- 0
@@ -1436,8 +1462,8 @@ circos5 <- function(file1, file2, file3, file4, file5,
     # Read data from file5 and add additional columns
     E <- readData(file5)
     E$factors <- "E"
-    sum <- sum(E$Count)
-    E$relCount <- E$Count / sum
+    sum <- sum(E$cloneCount)
+    E$relCount <- E$cloneCount / sum
     E$linkIndexA <- 0
     E$linkIndexB <- 0
     E$linkIndexC <- 0
@@ -1737,11 +1763,11 @@ circos5 <- function(file1, file2, file3, file4, file5,
     }
 
     # Add a starting row to each data set
-    dataA <- rbind(data.frame(Count = 0, id = "START", factors = "A", relCount = 0, linkIndexA = 0, linkIndexB = 0, linkIndexC = 0, linkIndexD = 0, linkIndexE = 0, status = "1A", accumRelCount = 0), A)
-    dataB <- rbind(data.frame(Count = 0, id = "START", factors = "B", relCount = 0, linkIndexA = 0, linkIndexB = 0, linkIndexC = 0, linkIndexD = 0, linkIndexE = 0, status = "1B", accumRelCount = 0), B)
-    dataC <- rbind(data.frame(Count = 0, id = "START", factors = "C", relCount = 0, linkIndexA = 0, linkIndexB = 0, linkIndexC = 0, linkIndexD = 0, linkIndexE = 0, status = "1C", accumRelCount = 0), C)
-    dataD <- rbind(data.frame(Count = 0, id = "START", factors = "D", relCount = 0, linkIndexA = 0, linkIndexB = 0, linkIndexC = 0, linkIndexD = 0, linkIndexE = 0, status = "1D", accumRelCount = 0), D)
-    dataE <- rbind(data.frame(Count = 0, id = "START", factors = "E", relCount = 0, linkIndexA = 0, linkIndexB = 0, linkIndexC = 0, linkIndexD = 0, linkIndexE = 0, status = "1E", accumRelCount = 0), E)
+    dataA <- rbind(data.frame(cloneCount = 0, id = "START", factors = "A", relCount = 0, linkIndexA = 0, linkIndexB = 0, linkIndexC = 0, linkIndexD = 0, linkIndexE = 0, status = "1A", accumRelCount = 0), A)
+    dataB <- rbind(data.frame(cloneCount = 0, id = "START", factors = "B", relCount = 0, linkIndexA = 0, linkIndexB = 0, linkIndexC = 0, linkIndexD = 0, linkIndexE = 0, status = "1B", accumRelCount = 0), B)
+    dataC <- rbind(data.frame(cloneCount = 0, id = "START", factors = "C", relCount = 0, linkIndexA = 0, linkIndexB = 0, linkIndexC = 0, linkIndexD = 0, linkIndexE = 0, status = "1C", accumRelCount = 0), C)
+    dataD <- rbind(data.frame(cloneCount = 0, id = "START", factors = "D", relCount = 0, linkIndexA = 0, linkIndexB = 0, linkIndexC = 0, linkIndexD = 0, linkIndexE = 0, status = "1D", accumRelCount = 0), D)
+    dataE <- rbind(data.frame(cloneCount = 0, id = "START", factors = "E", relCount = 0, linkIndexA = 0, linkIndexB = 0, linkIndexC = 0, linkIndexD = 0, linkIndexE = 0, status = "1E", accumRelCount = 0), E)
 
     # Combine data sets
     data <- rbind(dataA, dataB, dataC, dataD, dataE)
@@ -1931,7 +1957,7 @@ circos6 <- function(file1, file2, file3, file4, file5, file6, fileAliases = NULL
         fileAliases <- NULL
     }
     if (cutoff < 0.0) {
-        pirnt("Cutoff value is below zero. Defaulting to 1.0.")
+        print("Cutoff value is below zero. Defaulting to 1.0.")
         cutoff <- 1.0
     }
     if (cutoff > 1.0) {
