@@ -1828,6 +1828,11 @@ circos5 <- function(file1, file2, file3, file4, file5,
         color <- ramp(x / maxLinkSize)
         rgb(color, alpha = color[4], maxColorValue = 255)
     }
+    linkRampDE <- function(x) {
+        ramp <- colorRamp(c(linkColors[19], linkColors[20]), alpha = TRUE)
+        color <- ramp(x / maxLinkSize)
+        rgb(color, alpha = color[4], maxColorValue = 255)
+    }
 
     # Open output file, set parameters and initialize diagramm
     svg(diagrammFileName)
