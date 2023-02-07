@@ -43,7 +43,7 @@ circos <- function(files,
     } else if (nFiles == 5) {
         circos5(files[1], files[2], files[3], files[4], files[5], fileAliases, saveFolder, cutoff, sort, countColors, linkColors, showLinks)
     } else if (nFiles == 6) {
-        circos6(files[1], files[2], files[3], files[4], files[5], files[6], fileAliases, saveFolder, cutoff, sort, countColors, linkColors, showLinks)
+        circos6(files[1], files[2], files[3], files[4], files[5], files[6], fileAliases, saveFolder, cutoff, sort, countColors, linkColors) # TODO add showLinks again after fixing it
     }
 }
 
@@ -1955,7 +1955,18 @@ circos5 <- function(file1, file2, file3, file4, file5,
     }
 }
 
-circos6 <- function(file1, file2, file3, file4, file5, file6, fileAliases = NULL, saveFolder = NULL, cutoff = 1.0, sort = FALSE, countColors = c("#FFFFFFFF", "#0000FFFF"), linkColors = c("#FF000080")) {
+circos6 <- function(file1,
+                    file2,
+                    file3,
+                    file4,
+                    file5,
+                    file6,
+                    fileAliases = NULL,
+                    saveFolder = NULL,
+                    cutoff = 1.0,
+                    sort = FALSE,
+                    countColors = c("#FFFFFFFF", "#0000FFFF"),
+                    linkColors = c("#FF000080")) {
     # Catch invalid argument values
     if (!is.null(fileAliases) && length(fileAliases) < 6) {
         print("To few file aliases specified. Defaulting to file names.")
