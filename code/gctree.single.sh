@@ -15,9 +15,16 @@ echo ${f1}
 cp ${f} ${f1}
 
 vname=`echo $f | cut -d_ -f1`
-vgerm=`cat ~/data_dir/exp/britta/germline_fasta/${organism}.v.ext.fasta | xargs -n2 | grep "${vname}\*01" | cut -d" " -f2`
+echo $vname
+# multiple lines so this cannot work, unless we convert the fasta to put the whole sequence on one line
+#vgerm=`cat ~/data_dir/exp/britta/germline_fasta/${organism}.v.ext.fasta | xargs -n2 | grep "${vname}\*01" | cut -d" " -f2`
+vgerm=`sed -n "/${vname}\*01|/,/>/p" ~/data_dir/exp/britta/germline_fasta/${organism}.v.fasta | grep -v ">"`
+echo -e "$vgerm"
 jname=`echo $f | cut -d_ -f2`
-jgerm=`cat ~/data_dir/exp/britta/germline_fasta/${organism}.v.ext.fasta | xargs -n2 | grep "${jname}\*01" | cut -d" " -f2`
+echo $jname
+# this works because J segments are only one line
+jgerm=`cat ~/data_dir/exp/britta/germline_fasta/${organism}.j.ext.fasta | xargs -n2 | grep "${jname}\*01" | cut -d" " -f2`
+echo -e "$jgerm"
 cl=`echo $f | cut -d_ -f3`
 div="1" # long N sequence seems to help with alignment
 n=`expr $cl / $div`

@@ -6,5 +6,5 @@ deduplicate f.fasta --idmapfile idmap.csv --id_abundances --root ${name:0:10} --
 mkconfig --quick f.phyi dnaml > dnaml.cfg
 rm outtree outfile
 phylip dnaml < dnaml.cfg 2>&1 | tee dnaml.log
-gctree infer --verbose outfile abund.csv --root ${name:0:10} --frame 1 --idlabel
+gctree infer --verbose --root ${name:0:10} --frame 1 --idlabel --summarize_forest outfile abund.csv
 ~/data_dir/code/ete.py
