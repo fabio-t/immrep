@@ -107,7 +107,9 @@ jointype="raw" # because it's clonal trees, we already strip alleles (FIXME not 
 exp_dir="220701_etc_biopsies"
 exp_data_dir="220701_etc_biopsies"
 # excluding 41, failed
-indices=`echo {1..11} {13..17} {19..26} {28..34} 39 40 {42..54}`
+# removing 19-22, a few mice were rerun with better quality
+# order of MIDs is by mouse
+indices=`echo 4 55 12 57 58 1 59 60 61 62 2 23 24 25 26 3 28 29 30 11 13 14 51 52 53 54 16 35 36 38 15 39 40 42 7 8 63 64 65 66 9 10 67 68 69 18 5 43 44 45 46 6 47 48 49 50 17 31 32 33 34`
 m="3"
 ql="30"
 downsample="F"

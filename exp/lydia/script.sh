@@ -191,7 +191,7 @@ jointype="raw" # stripping them upstream now (8/12/2022)
 # indices=`echo {1..11} {13..17} {19..31}`
 # exp_dir="220218_itregtc4"
 # exp_data_dir="220218_itregtc4"
-# m="2"
+# m="3"
 # ql="30"
 # bc="_safe_long2"
 
@@ -202,12 +202,13 @@ jointype="raw" # stripping them upstream now (8/12/2022)
 # ql="30"
 # bc="_safe_long2"
 
-# indices=`echo 10 11 13 14 15 16 17 19 20 21 22 23`
-# exp_dir="221007_anakadda2"
-# exp_data_dir="221007_ana"
-# m="3"
-# ql="30"
-# bc="_safe_long2"
+## removed 17 and 19 as requested by Lydia; 02/06/2023
+indices=`echo 10 11 13 14 15 16 20 21 22 23`
+exp_dir="221007_anakadda2"
+exp_data_dir="221007_ana"
+m="3"
+ql="30"
+bc="_safe_long2"
 
 # indices=`echo {24..29}`
 # exp_dir="221007_clonekinetics"
@@ -238,12 +239,40 @@ jointype="raw" # stripping them upstream now (8/12/2022)
 # ql="30"
 # bc="_safe_long2"
 
-indices=`echo {14..17} {19..40}`
-exp_dir="221209_mm1-mm2"
-exp_data_dir="221209_hh2_mismatch12"
-m="3"
-ql="30"
-bc="_safe_long2"
+# indices=`echo {14..17} {19..40}`
+# exp_dir="221209_mm1-mm2"
+# exp_data_dir="221209_hh2_mismatch12"
+# m="3"
+# ql="30"
+# bc="_safe_long2"
+
+# indices=`echo {1..11} {13..17} {19..26}`
+# exp_dir="221118_itreg-tc5"
+# exp_data_dir="221118_itreg-tc5"
+# m="3"
+# ql="30"
+# bc="_safe_long2"
+
+# indices=`echo {1..11} {13..17} 19 20`
+# exp_dir="230104_treg-challenge"
+# exp_data_dir="230317_treg-challenge_HH-exp3"
+# m="3"
+# ql="30"
+# bc="_safe_long2"
+
+# indices=`echo {21..32}`
+# exp_dir="230104_HH_exp3"
+# exp_data_dir="230317_treg-challenge_HH-exp3"
+# m="3"
+# ql="30"
+# bc="_safe_long2"
+
+# indices=`echo 1 3 4 6 7 9 10 13 14 16 17 20`
+# exp_dir="230104_treg-challenge_merged"
+# exp_data_dir="230317_treg-challenge_merged"
+# m="3"
+# ql="30"
+# bc="_safe_long2"
 
 # load and run script
 source ../../code/script.sh

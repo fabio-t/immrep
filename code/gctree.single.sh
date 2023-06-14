@@ -15,9 +15,9 @@ echo ${f1}
 cp ${f} ${f1}
 
 vname=`echo $f | cut -d_ -f1`
-vgerm=`sed -n "/${vname}\*01|/,/>/p" ~/data_dir/exp/britta/germline_fasta/${organism}.v.ext.fasta | sed '1d; $d'`
+vgerm=`cat ~/data_dir/exp/britta/germline_fasta/${organism}.v.ext.fasta | xargs -n2 | grep "${vname}\*01" | cut -d" " -f2`
 jname=`echo $f | cut -d_ -f2`
-jgerm=`sed -n "/${jname}\*01|/,/>/p" ~/data_dir/exp/britta/germline_fasta/${organism}.j.ext.fasta | sed '1d; $d'`
+jgerm=`cat ~/data_dir/exp/britta/germline_fasta/${organism}.v.ext.fasta | xargs -n2 | grep "${jname}\*01" | cut -d" " -f2`
 cl=`echo $f | cut -d_ -f3`
 div="1" # long N sequence seems to help with alignment
 n=`expr $cl / $div`

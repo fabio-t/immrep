@@ -446,7 +446,7 @@ overview <- function(dirname = "overview", immdata = NULL, exclude = NULL) {
   ggsave(filename = paste0(dirname, "raref-log-norm.pdf"), width = 16, height = (9 / 16) * 16)
 }
 
-track_clones <- function(regexp, dirname, indices = NULL, invert = F, n = 15, immdata = NULL) {
+track_clones <- function(regexp, dirname, indices = NULL, invert = F, n = 15, immdata = NULL, y_lim = NULL) {
   if (is.null(immdata)) {
     immdata <- immload()
   }
@@ -455,40 +455,45 @@ track_clones <- function(regexp, dirname, indices = NULL, invert = F, n = 15, im
     # one-vs-all
     dirname <- paste0("./tracking/all/")
     dirname <- make_path(dirname)
-    print(dirname)
 
     mid_list <- rownames(mid_labels)
   } else if (!is.null(indices)) {
     dirname <- paste0("./tracking/", dirname, "/")
     dirname <- make_path(dirname)
-    print(dirname)
 
     column_indices <- indices
 
     mid_list <- colnames(mids_counts)[column_indices]
     label_list <- mid_names[column_indices]
-
+    print(column_indices)
+    print(mid_list)
     print(label_list)
 
-    immdata$data <- immdata$data[column_indices]
+    immdata$data <- immdata$data[mid_list]
   } else {
     dirname <- paste0("./tracking/", dirname, "/")
     dirname <- make_path(dirname)
-    print(dirname)
 
     column_indices <- grep(regexp, mid_names, perl = T, invert = invert)
 
     mid_list <- colnames(mids_counts)[column_indices]
     label_list <- mid_names[column_indices]
-
+    print(column_indices)
+    print(mid_list)
     print(label_list)
 
-    immdata$data <- immdata$data[column_indices]
+    immdata$data <- immdata$data[mid_list]
   }
+
+  print(dirname)
 
   for (mid in mid_list) {
     tc1 <- trackClonotypes(immdata$data, list(mid, n), .col = "v+nt+j")
-    vis(tc1) + theme_minimal(base_size = 12) + theme(axis.text.x = element_text(angle = 90))
+    if (is.null(y_lim)) {
+      vis(tc1) + theme_minimal(base_size = 12) + theme(axis.text.x = element_text(angle = 90))
+    } else {
+      vis(tc1) + expand_limits(y = c(NA, y_lim)) + theme_minimal(base_size = 12) + theme(axis.text.x = element_text(angle = 90))
+    }
     ggsave(filename = paste0(dirname, mid, ".pdf"), width = 16, height = (9 / 16) * 16)
   }
 }
