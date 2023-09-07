@@ -1,5 +1,6 @@
 #!/usr/bin/python3
 
+import matplotlib
 import csv
 import pickle
 import math
@@ -11,7 +12,9 @@ import pandas as pd
 # FIXME: figure out some way to make this more generic across multiple
 # experiments; for now it just uses the MID number as colour position,
 # which severely limits its usage
-colours = COLOR_SCHEMES["paired"]
+
+colours = matplotlib.colormaps['tab20b'].colors + matplotlib.colormaps['tab20c'].colors + matplotlib.colormaps['Set1'].colors + matplotlib.colormaps['Set2'].colors + matplotlib.colormaps['Dark2'].colors
+colours = [matplotlib.colors.rgb2hex(colour) for colour in colours]
 
 aln = AlignIO.read("f.orig.fasta", "fasta")
 seqs = {}
@@ -46,6 +49,7 @@ t = p.tree
 
 def layout(n):
     size = max(1, 10 * math.sqrt(n.abundance))
+
     if n.abundance > 0:
         # don't add a label for internal nodes
         T = TextFace(n.name)
@@ -55,6 +59,7 @@ def layout(n):
         T.hz_align = 1
         T.rotation = -90
         faces.add_face_to_node(T, n, 0)
+
     if n.abundance > 1:
         cols = [colours[int(s[3:]) % len(colours)] for s in seqs[n.name]["sample"]]
         values = seqs[n.name]["percents"]
@@ -69,6 +74,7 @@ def layout(n):
 
 def layout2(n):
     size = max(1, 10 * math.sqrt(n.abundance))
+
     if n.abundance > 0:
         # don't add a label for internal nodes
         T = TextFace(n.name)
@@ -78,6 +84,7 @@ def layout2(n):
         T.hz_align = 1
         T.rotation = -90
         faces.add_face_to_node(T, n, 0)
+
     if n.name in seqs:
         # add CDR3
         # print(n.name)
