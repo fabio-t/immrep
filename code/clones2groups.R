@@ -9,11 +9,11 @@ option_list <- list(
   ),
   make_option(c("-g", "--group-by"),
     type = "character", default = NULL,
-    help = "if set, in addition to the normal midX_clones.csv it will also pool together samples according to the specified variable (eg, mouse). Separate by , if multiple groups needed."
+    help = "if set, in addition to the normal midX_clones.csv it will also pool together samples according to the specified variable (eg, mouse). Separate by , if multiple groups needed. Fasta files are always written for each group."
   ),
-  make_option(c("-f", "--save-fasta"),
-    type = "character", default = NULL,
-    help = "if set, it will actually write the fasta files."
+  make_option(c("-s", "--save-fasta"),
+    action = "store_true", dest="savefasta", default = FALSE,
+    help = "if set, it will write the fasta files for each individual MID."
   )
 )
 opt_parser <- OptionParser(option_list = option_list)
@@ -35,13 +35,7 @@ if (is.null(opt$downsample) || opt$downsample == "False" || opt$downsample == "F
   downsample <- as.integer(opt$downsample)
 }
 
-if (is.null(opt$"save-fasta") || opt$downsample == "False" || opt$downsample == "F") {
-  savefasta <- F
-} else {
-  savefasta <- T
-}
-
-clones2groups(overwrite = T, savefasta = savefasta, dirname = "fasta", downsample = downsample)
+clones2groups(overwrite = T, savefasta = opt$savefasta, dirname = "fasta", downsample = downsample)
 
 if (!is.null(opt$"group-by")) {
   groups <- unlist(strsplit(opt$"group-by", ","))

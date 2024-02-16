@@ -9,12 +9,17 @@ from ete3 import Tree, faces, TreeStyle, NodeStyle, TextFace, SequenceFace, COLO
 from Bio import AlignIO
 import pandas as pd
 
-# FIXME: figure out some way to make this more generic across multiple
-# experiments; for now it just uses the MID number as colour position,
-# which severely limits its usage
-
-colours = matplotlib.colormaps['tab20b'].colors + matplotlib.colormaps['tab20c'].colors + matplotlib.colormaps['Set1'].colors + matplotlib.colormaps['Set2'].colors + matplotlib.colormaps['Dark2'].colors
+colours = matplotlib.colormaps['tab10'].colors
 colours = [matplotlib.colors.rgb2hex(colour) for colour in colours]
+
+# FIXME: this will not apply to other experiments, it's temporary.
+# find a better way. Best one: specify colour directly in mid_labels
+mid_condition_mapping = {}
+with open("../../../mid_labels.csv", newline="") as f:
+    for i, line in enumerate(csv.reader(f)):
+        if i > 0:
+            mid_condition_mapping[line[0]] = line[4]
+conditions = list(set(mid_condition_mapping.values()))
 
 aln = AlignIO.read("f.orig.fasta", "fasta")
 seqs = {}
@@ -61,7 +66,7 @@ def layout(n):
         faces.add_face_to_node(T, n, 0)
 
     if n.abundance > 1:
-        cols = [colours[int(s[3:]) % len(colours)] for s in seqs[n.name]["sample"]]
+        cols = [colours[conditions.index(mid_condition_mapping[s])] for s in seqs[n.name]["sample"]]
         values = seqs[n.name]["percents"]
         F = faces.PieChartFace(values, colors=cols,
                                width=size * 2, height=size * 2)
@@ -91,7 +96,7 @@ def layout2(n):
         S = SequenceFace(seqs[n.name]["cdr3nt"][0], 'nt') #codon=seqs[n.name]["cdr3nt"][0])
         faces.add_face_to_node(S, n, 2, position="aligned")
     if n.abundance > 1:
-        cols = [colours[int(s[3:]) % len(colours)] for s in seqs[n.name]["sample"]]
+        cols = [colours[conditions.index(mid_condition_mapping[s])] for s in seqs[n.name]["sample"]]
         values = seqs[n.name]["percents"]
         F = faces.PieChartFace(values, colors=cols,
                                width=size * 2, height=size * 2)

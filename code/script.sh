@@ -89,10 +89,10 @@ if [[ "$data_type" == "bcr" ]]; then
   if [ -n "$groupby" ]; then
     groupby="-g ${groupby}"
   fi
-  if [ -n "$savefasta" ]; then
-    savefasta="-s ${savefasta}"
-  fi
-  Rscript /mnt/storage/data/code/clones2groups.R $downsample $groupby $savefasta
+  # if [ -n "$savefasta" ]; then
+  #   savefasta="-s ${savefasta}"
+  # fi
+  Rscript /mnt/storage/data/code/clones2groups.R $downsample $groupby -s
 fi
 
 for i in $indices; do
